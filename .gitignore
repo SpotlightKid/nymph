@@ -1,0 +1,4 @@
+nimble.paths
+*.so
+*.dll
+/.lv2/
