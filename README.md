@@ -32,8 +32,11 @@ Install the `amp.lv2` example plugin:
   them as you like (also rename `amp.lv2/amp.ttl`). I'll use `myplugin` as the
   base name in the examples below.
 
-* Edit `myplugin.lv2/manifest.ttl` and change the plugin URI and change the
-  plugin's shared library name defined with `lv2:binary` to `libmyplugin.so`.
+* Edit `myplugin.lv2/manifest.ttl`:
+    * Change the plugin URI.
+    * Change the plugin's shared library name defined via `lv2:binary` to
+      `libmyplugin.so`.
+    * Change file name referenced via `rdfs:seeAlso` to `myplugin.ttl`.
 
 * Edit `myplugin.lv2/myplugin.ttl`:
     * Change the plugin URI.
