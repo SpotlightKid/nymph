@@ -57,9 +57,13 @@ task build_ex, "Build given example plugin":
         switch("app", "lib")
         switch("noMain", "on")
         switch("mm", "arc")
-        switch("opt", "speed")
-        switch("define", "release")
         switch("out", dll)
+
+        when not defined(release) and not defined(debug):
+            echo &"Compiling plugin {example} in release mode."
+            switch("define", "release")
+            switch("opt", "speed")
+
         setCommand("compile", source)
     else:
         echo &"Example '{example}' not found."
