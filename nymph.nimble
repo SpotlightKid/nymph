@@ -64,6 +64,8 @@ task build_ex, "Build given example plugin":
             echo &"Compiling plugin {example} in release mode."
             switch("define", "release")
             switch("opt", "speed")
+            switch("define", "lto")
+            switch("define", "strip")
 
         setCommand("compile", source)
     else:
