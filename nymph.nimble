@@ -1,3 +1,4 @@
+import std/os except commandLineParams
 import std/strformat
 
 # Package definition
@@ -49,9 +50,9 @@ task build_ex, "Build given example plugin":
         return
 
     let example = args[^1]
-    let source = thisDir() & "/examples/" & example & ".nim"
-    let bundle = thisDir() & "/examples/" & example & ".lv2"
-    let dll = bundle & "/" & toDll(example)
+    let source = thisDir() / "examples" / example & ".nim"
+    let bundle = thisDir() / "examples" / example & ".lv2"
+    let dll = bundle / toDll(example)
 
     if fileExists(source):
         switch("app", "lib")
@@ -107,14 +108,14 @@ task lv2bm, "Run lv2bm benchmark on given example plugin":
         echo &"Plugin URI for example '{example}' not set."
         return
 
-    let examplesDir = thisDir() & "/examples"
-    let bundle = examplesDir & "/" & example & ".lv2"
-    let dll = bundle & "/" & toDll(example)
+    let examplesDir = thisDir() / "examples"
+    let bundle = examplesDir / example & ".lv2"
+    let dll = bundle / toDll(example)
 
     if fileExists(dll):
         let lv2_path = getEnv("LV2_PATH")
-        let tempLv2Dir = thisDir() & "/.lv2"
-        let bundleLink = tempLv2Dir & "/" & example & ".lv2"
+        let tempLv2Dir = thisDir() / ".lv2"
+        let bundleLink = tempLv2Dir / example & ".lv2"
 
         mkDir(tempLv2Dir)
         rmFile(bundleLink)
