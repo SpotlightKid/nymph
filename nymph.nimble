@@ -15,6 +15,14 @@ requires "nim >= 2.0"
 
 # Custom tasks
 
+type Example = tuple
+    name: string
+    uri: string
+    source: string
+    bundle: string
+    dll: string
+
+
 const examples = to_table({
     "amp": "urn:nymph:examples:amp"
 })
@@ -29,106 +37,78 @@ proc parseArgs(): tuple[options: seq[string], args: seq[string]] =
             result.args.add(arg)
 
 
-proc showArgs() =
-    ## Show task environment (for debugging when writing nimble tasks)
-    echo "Command: ", getCommand()
-    echo "ProjectName: ", projectName()
-    echo "ProjectDir: ", projectDir()
-    echo "ProjectPath: ", projectPath()
-    echo "Task args: ", commandLineParams
+proc getExample(task_name: string): Example =
+    let (_, args) = parseArgs()
 
-    for i in 0..paramCount():
-        echo &"Arg {i}: ", paramStr(i)
+    if args.len == 0:
+        quit(&"Usage: nimble {task_name} <example name>")
+
+    result.name = changeFileExt(args[^1], "")
+
+    let examplesDir = thisDir() / "examples"
+    result.source = examplesDir / changeFileExt(result.name, "nim")
+
+    if not fileExists(result.source):
+        quit(&"Example '{result.name}' not found.")
+
+    result.uri = examples.getOrDefault(result.name)
+
+    if result.uri == "":
+        quit(&"Plugin URI for example '{result.name}' not set.")
+
+    result.bundle = examplesDir / changeFileExt(result.name, "lv2")
+    result.dll = result.bundle / toDll(result.name)
 
 
 task build_ex, "Build given example plugin":
-    #showArgs()
-    let (_, args) = parseArgs()
+    let ex = getExample("build_ex")
 
-    if args.len == 0:
-        echo "Usage: nimble build_ex <example name>"
-        return
+    switch("app", "lib")
+    switch("noMain", "on")
+    switch("mm", "arc")
+    switch("out", ex.dll)
 
-    let example = args[^1]
-    let source = thisDir() / "examples" / example & ".nim"
-    let bundle = thisDir() / "examples" / example & ".lv2"
-    let dll = bundle / toDll(example)
+    when not defined(release) and not defined(debug):
+        echo &"Compiling plugin {ex.name} in release mode."
+        switch("define", "release")
+        switch("opt", "speed")
+        switch("define", "lto")
+        switch("define", "strip")
 
-    if fileExists(source):
-        switch("app", "lib")
-        switch("noMain", "on")
-        switch("mm", "arc")
-        switch("out", dll)
-
-        when not defined(release) and not defined(debug):
-            echo &"Compiling plugin {example} in release mode."
-            switch("define", "release")
-            switch("opt", "speed")
-            switch("define", "lto")
-            switch("define", "strip")
-
-        setCommand("compile", source)
-    else:
-        echo &"Example '{example}' not found."
+    setCommand("compile", ex.source)
 
 
 task lv2lint, "Run lv2lint check on given example plugin":
-    let (_, args) = parseArgs()
+    let ex = getExample("lv2lint")
 
-    if args.len == 0:
-        echo "Usage: nimble lv2lint <example name>"
-        return
-
-    let example = args[^1]
-    let uri = examples.getOrDefault(example)
-
-    if uri == "":
-        echo &"Plugin URI for example '{example}' not set."
-        return
-
-    let examplesDir = thisDir() & "/examples"
-    let bundle = examplesDir & "/" & example & ".lv2"
-    let dll = bundle & "/" & toDll(example)
-
-    if fileExists(dll):
-        exec(&"lv2lint -s NimMain -I {bundle} \"{uri}\"")
+    if fileExists(ex.dll):
+        exec(&"lv2lint -s NimMain -I \"{ex.bundle}\" \"{ex.uri}\"")
     else:
-        echo &"Example '{example}' shared library not found. Use task 'build_ex' to build it."
+        echo &"Example '{ex.name}' shared library not found. Use task 'build_ex' to build it."
 
 
 task lv2bm, "Run lv2bm benchmark on given example plugin":
-    let (_, args) = parseArgs()
+    let ex = getExample("lv2bm")
 
-    if args.len == 0:
-        echo "Usage: nimble lv2bm <example name>"
+    if ex.uri == "":
+        echo &"Plugin URI for example '{ex.name}' not set."
         return
 
-    let example = args[^1]
-    let uri = examples.getOrDefault(example)
-
-    if uri == "":
-        echo &"Plugin URI for example '{example}' not set."
-        return
-
-    let examplesDir = thisDir() / "examples"
-    let bundle = examplesDir / example & ".lv2"
-    let dll = bundle / toDll(example)
-
-    if fileExists(dll):
+    if fileExists(ex.dll):
         let lv2_path = getEnv("LV2_PATH")
         let tempLv2Dir = thisDir() / ".lv2"
-        let bundleLink = tempLv2Dir / example & ".lv2"
+        let bundleLink = tempLv2Dir / changeFileExt(ex.name, "lv2")
 
         mkDir(tempLv2Dir)
         rmFile(bundleLink)
-        exec(&"ln -s \"{bundle}\" \"{bundleLink}\"")
+        exec(&"ln -s \"{ex.bundle}\" \"{bundleLink}\"")
 
         if lv2_path == "":
             putEnv("LV2_PATH", tempLv2Dir)
         else:
             putEnv("LV2_PATH", tempLv2Dir & ":" & lv2_path)
 
-        exec(&"lv2bm --full-test -i white \"{uri}\"")
+        exec(&"lv2bm --full-test -i white \"{ex.uri}\"")
     else:
-        echo &"Example '{example}' shared library not found. Use task 'build_ex' to build it."
+        echo &"Example '{ex.name}' shared library not found. Use task 'build_ex' to build it."
 
