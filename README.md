@@ -21,6 +21,13 @@ Install the `amp.lv2` example plugin:
 
     cp -a examples/amp.lv2 ~/.lv2
 
+Other example plugins can be found in the [examples](./examples) directory and
+can be built and tested with similar commands, just changing the example name
+to the basename of the plugin's LV2 bundle dir.
+
+Currently, there is only one other example plugin, `multimode_filter`, but
+more will be added soon.
+
 
 ## How To
 
