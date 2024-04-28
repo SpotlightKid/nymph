@@ -24,7 +24,7 @@ type
 proc instantiate(descriptor: ptr Lv2Descriptor; sampleRate: cdouble;
                  bundlePath: cstring; features: ptr ptr Lv2Feature):
                  Lv2Handle {.cdecl.} =
-     var plug = createShared(SVFPlugin)
+     let plug = createShared(SVFPlugin)
      plug.svf = initFilterSV(fmLowPass, sampleRate)
      return plug
 
@@ -56,7 +56,7 @@ proc activate(instance: Lv2Handle) {.cdecl.} =
 
 proc run(instance: Lv2Handle; nSamples: cuint) {.cdecl.} =
     let plug = cast[ptr SVFPlugin](instance)
-    plug.svf.setMode(plug.mode[].int.clamp(0, 4).FilterMode)
+    plug.svf.setMode(plug.mode[].int.clamp(0, 3).FilterMode)
     plug.svf.setCutoff(plug.cutoff[].clamp(16.0, 7_000.0))
     plug.svf.setQ(plug.q[].clamp(0.8, 10.0))
     plug.svf.calcCoef()

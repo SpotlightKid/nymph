@@ -1,5 +1,7 @@
 ## State Variable Filter after Hal Chamberlin, Musical Applications of Microprocessors
+##
 ## Only stable up to fc ~= fs / 6.5 !
+## Sensible range for q ~= 0.8 .. 10.0
 
 import std/math
 
@@ -18,23 +20,23 @@ type
         a: float
         b: float
         maxCutoff: float
-        sampleRate: float
+        sampleRate: float64
         needs_update: bool
 
 
 proc reset*(self: var FilterSV) =
-    self.lowPass = 0
-    self.hiPass = 0
-    self.bandPass = 0
-    self.bandReject = 0
+    self.lowPass = 0.0
+    self.hiPass = 0.0
+    self.bandPass = 0.0
+    self.bandReject = 0.0
 
 
-proc initFilterSV*(mode: FilterMode = fmLowPass, sampleRate: float = 48_000): FilterSV =
+proc initFilterSV*(mode: FilterMode = fmLowPass, sampleRate: float64 = 48_000.0): FilterSV =
     result.mode = mode
     result.sampleRate = sampleRate
     result.reset()
-    result.a = 0
-    result.b = 0
+    result.a = 0.0
+    result.b = 0.0
     result.maxCutoff = sampleRate / 6.0
     result.needs_update = true
 
@@ -52,7 +54,7 @@ proc calcCoef*(self: var FilterSV) =
 
 
 proc setCutoff*(self: var FilterSV, cutoff: float) =
-    let fc = if cutoff > self.maxCutoff: self.maxCutoff else: cutoff
+    let fc = min(self.maxCutoff, cutoff)
 
     if fc != self.cutoff:
         self.cutoff = fc
