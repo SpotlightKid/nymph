@@ -24,7 +24,8 @@ type Example = tuple
 
 
 const examples = to_table({
-    "amp": "urn:nymph:examples:amp"
+    "amp": "urn:nymph:examples:amp",
+    "multimode_filter": "urn:nymph:examples:multimode-filter",
 })
 
 
