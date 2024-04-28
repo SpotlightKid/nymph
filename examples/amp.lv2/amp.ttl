@@ -12,8 +12,6 @@
 
     lv2:optionalFeature lv2:hardRTCapable , bufs:boundedBlockLength , opts:options ;
 
-    lv2:requiredFeature <http://lv2plug.in/ns/ext/urid#map> ;
-
     opts:supportedOption bufs:nominalBlockLength ,
                          bufs:maxBlockLength ,
                          params:sampleRate ;
