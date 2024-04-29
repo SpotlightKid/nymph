@@ -2,6 +2,7 @@
 
 import nymph
 
+import paramsmooth
 import svf
 
 const PluginUri = "urn:nymph:examples:multimode-filter"
@@ -19,6 +20,7 @@ type
         q: ptr cfloat
         mode: ptr cfloat
         svf: FilterSV
+        smoothCutoff: ParamSmooth
 
 
 proc instantiate(descriptor: ptr Lv2Descriptor; sampleRate: cdouble;
@@ -26,6 +28,7 @@ proc instantiate(descriptor: ptr Lv2Descriptor; sampleRate: cdouble;
                  Lv2Handle {.cdecl.} =
      let plug = createShared(SVFPlugin)
      plug.svf = initFilterSV(fmLowPass, sampleRate)
+     plug.smoothCutoff = initParamSmooth(20.0, sampleRate)
      return plug
 
 
@@ -56,12 +59,13 @@ proc activate(instance: Lv2Handle) {.cdecl.} =
 
 proc run(instance: Lv2Handle; nSamples: cuint) {.cdecl.} =
     let plug = cast[ptr SVFPlugin](instance)
+    let cutoff = plug.cutoff[].clamp(16.0, 7_000.0)
     plug.svf.setMode(plug.mode[].int.clamp(0, 3).FilterMode)
-    plug.svf.setCutoff(plug.cutoff[].clamp(16.0, 7_000.0))
     plug.svf.setQ(plug.q[].clamp(0.8, 10.0))
-    plug.svf.calcCoef()
 
     for pos in 0 ..< nSamples:
+        plug.svf.setCutoff(plug.smoothCutoff.process(cutoff))
+        plug.svf.calcCoef()
         plug.output[pos] = plug.svf.process(plug.input[pos])
 
 

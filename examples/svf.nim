@@ -11,15 +11,7 @@ type
 
     FilterSV* = object
         mode: FilterMode
-        cutoff: float
-        q: float
-        lowPass: float
-        hiPass: float
-        bandPass: float
-        bandReject: float
-        a: float
-        b: float
-        maxCutoff: float
+        cutoff, q, lowPass, hiPass, bandPass, bandReject, a, b, maxCutoff: float
         sampleRate: float64
         needs_update: bool
 
