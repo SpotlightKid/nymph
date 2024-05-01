@@ -7,7 +7,7 @@
 @prefix props: <http://lv2plug.in/ns/ext/port-props#> .
 @prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
-@prefix unit: <http://lv2plug.in/ns/extensions/units#> .
+@prefix units: <http://lv2plug.in/ns/extensions/units#> .
 
 <urn:nymph:examples:multimode-filter>
     a lv2:Plugin, lv2:AmplifierPlugin , doap:Project ;
@@ -39,7 +39,7 @@
         lv2:minimum 16.0 ;
         lv2:maximum 7000.0 ;
         lv2:portProperty props:logarithmic;
-        unit:unit unit:hz ;
+        units:unit units:hz ;
     ],
     [
         a lv2:InputPort, lv2:ControlPort ;
