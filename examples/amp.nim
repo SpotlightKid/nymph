@@ -22,9 +22,12 @@ template db2coeff(db: cfloat): cfloat =
 
 
 proc instantiate(descriptor: ptr Lv2Descriptor; sampleRate: cdouble;
-                 bundlePath: cstring; features: ptr ptr Lv2Feature):
+                 bundlePath: cstring; features: ptr UncheckedArray[ptr Lv2Feature]):
                  Lv2Handle {.cdecl.} =
-    return createShared(AmpPlugin)
+    try:
+        return createShared(AmpPlugin)
+    except OutOfMemDefect:
+        return nil
 
 
 proc connectPort(instance: Lv2Handle; port: cuint;
@@ -78,4 +81,3 @@ proc lv2Descriptor(index: cuint): ptr Lv2Descriptor {.
         result.deactivate = deactivate
         result.cleanup = cleanup
         result.extensionData = extensionData
-

@@ -24,7 +24,7 @@ proc setSampleRate*(self: var ParamSmooth, sampleRate: float64) =
         self.z = 0.0
 
 
-proc process*(self: var ParamSmooth, sample: float): float =
+proc process*(self: var ParamSmooth, sample: float): float {.inline.} =
     self.z = (sample * self.b) + (self.z * self.a)
     return self.z
 
