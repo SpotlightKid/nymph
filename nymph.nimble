@@ -26,6 +26,7 @@ type Example = tuple
 const examples = to_table({
     "amp": "urn:nymph:examples:amp",
     "multimode_filter": "urn:nymph:examples:multimode-filter",
+    "miditranspose": "urn:nymph:examples:miditranspose",
 })
 
 
@@ -83,7 +84,7 @@ task lv2lint, "Run lv2lint check on given example plugin":
     let ex = getExample("lv2lint")
 
     if fileExists(ex.dll):
-        exec(&"lv2lint -s NimMain -I \"{ex.bundle}\" \"{ex.uri}\"")
+        exec(&"lv2lint -s NimMain -s NimDestroyGlobals -I \"{ex.bundle}\" \"{ex.uri}\"")
     else:
         echo &"Example '{ex.name}' shared library not found. Use task 'build_ex' to build it."
 

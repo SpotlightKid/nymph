@@ -1,0 +1,66 @@
+@prefix atom: <http://lv2plug.in/ns/ext/atom#> .
+@prefix bufs: <http://lv2plug.in/ns/ext/buf-size#> .
+@prefix doap: <http://usefulinc.com/ns/doap#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix lv2:  <http://lv2plug.in/ns/lv2core#> .
+@prefix midi: <http://lv2plug.in/ns/ext/midi#> .
+@prefix opts: <http://lv2plug.in/ns/ext/options#> .
+@prefix params: <http://lv2plug.in/ns/ext/parameters#> .
+@prefix props: <http://lv2plug.in/ns/ext/port-props#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix units: <http://lv2plug.in/ns/extensions/units#> .
+@prefix urid: <http://lv2plug.in/ns/ext/urid#> .
+
+<urn:nymph:examples:miditranspose>
+    a lv2:Plugin, lv2:MIDIPlugin , doap:Project ;
+
+    lv2:optionalFeature lv2:hardRTCapable , bufs:boundedBlockLength , opts:options ;
+
+    lv2:requiredFeature urid:map ;
+
+    opts:supportedOption bufs:nominalBlockLength ,
+                         bufs:maxBlockLength ,
+                         params:sampleRate ;
+
+    lv2:port [
+        a lv2:InputPort , atom:AtomPort ;
+        lv2:index 0 ;
+        atom:bufferType atom:Sequence ;
+        atom:supports midi:MidiEvent ;
+        lv2:designation lv2:control ;
+        lv2:symbol "midi_in" ;
+        lv2:name "MIDI In"
+    ] ,
+    [
+        a lv2:OutputPort , atom:AtomPort ;
+        lv2:index 1 ;
+        atom:bufferType atom:Sequence ;
+        atom:supports midi:MidiEvent ;
+        lv2:symbol "midi_out" ;
+        lv2:name "MIDI Out"
+    ] ,
+    [
+        a lv2:InputPort, lv2:ControlPort ;
+        lv2:index 2 ;
+        lv2:name "Transposition" ;
+        lv2:symbol "transposition" ;
+        lv2:portProperty lv2:integer ;
+        lv2:default 0 ;
+        lv2:minimum -12 ;
+        lv2:maximum 12 ;
+        units:unit units:semitone12TET
+    ] ; 
+
+    rdfs:comment "A simple MIDI transposition LV2 plugin." ;
+
+    doap:name "nymph miditranspose" ;
+    doap:license <https://spdx.org/licenses/MIT> ;
+
+    doap:maintainer [
+        foaf:name "Christopher Arndt" ;
+        foaf:mbox <mailto:info@chrisarndt.de> ;
+        foaf:homepage <https://gitlab.com/SpotlightKid/nymph> ;
+    ] ;
+
+    lv2:microVersion 0 ;
+    lv2:minorVersion 1 .
