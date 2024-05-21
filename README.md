@@ -25,8 +25,8 @@ Other example plugins can be found in the [examples](./examples) directory and
 can be built and tested with similar commands, just changing the example name
 to the basename of the plugin's LV2 bundle dir.
 
-Currently, there is only one other example plugin, `multimode_filter`, but
-more will be added soon.
+Currently, there are only two other example plugins, `multimode_filter` and
+`miditranspose`, but more will be added in due time.
 
 
 ## How To
