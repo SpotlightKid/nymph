@@ -15,27 +15,23 @@ const
     lv2UridUnmap* = lv2UridPrefix & "unmap"
 
 ##
-## Opaque pointer to host data for uridMap.
+## Opaque pointer to host data for UridMap.
 ##
-
 type UridMapHandle* = pointer
 
 ##
 ## Opaque pointer to host data for uridUnmap.
 ##
-
 type UridUnmapHandle* = pointer
 
 ##
 ## URI mapped to an integer.
 ##
-
 type Urid* = distinct uint32
 
 ##
-## URID Map Feature (LV2_URID__map)
+## URID Map Feature (lv2UridMap)
 ##
-
 type UridMap* {.bycopy.} = object
     ##
     ## Opaque pointer to host data.
@@ -67,11 +63,9 @@ type UridMap* {.bycopy.} = object
     ##
     map*: proc (handle: UridMapHandle; uri: cstring): Urid
 
-
 ##
-## URI Unmap Feature (LV2_URID__unmap)
+## URI Unmap Feature (lv2UridUnmap)
 ##
-
 type UridUnmap* {.bycopy.} = object
     ##
     ## Opaque pointer to host data.

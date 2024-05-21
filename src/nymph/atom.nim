@@ -6,6 +6,8 @@
 ## See <http://lv2plug.in/ns/ext/atom> for details.
 ##
 
+import ptrmath
+
 const
     lv2AtomBaseUri ="http://lv2plug.in/ns/ext/atom"
     lv2AtomPrefix = lv2AtomBaseUri & "#"
@@ -51,29 +53,12 @@ const
 template atomContents*(`type`, atom: untyped): pointer =
     cast[ptr uint8](atom) + sizeof(`type`)
 
-#[
-{.push header: "lv2/atom/atom.h".}
-
-var atomReferenceType* {.importc: "LV2_ATOM_REFERENCE_TYPE".}: int
-
-##
-## Const version of LV2_ATOM_CONTENTS.
-##
-proc atomContentsConst*(`type`: untyped; atom: untyped) {.importc: "LV2_ATOM_CONTENTS_CONST".}
-
 ##
 ## Return a pointer to the body of an Atom.  The "body" of an atom is the
-## data just past the LV2_Atom head (i.e. the same offset for all types).
+## data just past the Atom head (i.e. the same offset for all types).
 ##
-proc atomBody*(atom: untyped) {.importc: "LV2_ATOM_BODY".}
-
-##
-## Const version of LV2_ATOM_BODY.
-##
-proc atomBodyConst*(atom: untyped) {.importc: "LV2_ATOM_BODY_CONST".}
-
-{.pop.}
-]#
+template atomBody*(atom: untyped): pointer =
+    atomContents(Atom, atom)
 
 type
     ## The header of an atom:Atom.
@@ -81,35 +66,35 @@ type
         size*: uint32  ## Size in bytes, not including type and size.
         `type`*: uint32  ## of this atom (mapped URI).
 
-    ## An atom:Int or atom:Bool.  May be cast to LV2_Atom.
+    ## An atom:Int or atom:Bool.  May be cast to Atom.
     AtomInt* {.bycopy.} = object
         atom*: Atom  ## Atom header.
         body*: int32  ## Integer value.
 
-    ## An atom:Long.  May be cast to LV2_Atom.
+    ## An atom:Long.  May be cast to Atom.
     AtomLong* {.bycopy.} = object
         atom*: Atom  ## Atom header.
         body*: int64  ## Integer value.
 
-    ## An atom:Float.  May be cast to LV2_Atom.
+    ## An atom:Float.  May be cast to Atom.
     AtomFloat* {.bycopy.} = object
         atom*: Atom  ## Atom header.
         body*: cfloat  ## Floating point value.
 
-    ## An atom:Double.  May be cast to LV2_Atom.
+    ## An atom:Double.  May be cast to Atom.
     AtomDouble* {.bycopy.} = object
         atom*: Atom  ## Atom header.
         body*: cdouble  ## Floating point value.
 
-    ## An atom:Bool.  May be cast to LV2_Atom.
+    ## An atom:Bool.  May be cast to Atom.
     AtomBool* = distinct AtomInt
 
-    ## An atom:URID.  May be cast to LV2_Atom.
+    ## An atom:URID.  May be cast to Atom.
     AtomUrid* {.bycopy.} = object
         atom*: Atom  ## Atom header.
         body*: uint32  ## URID.
 
-    ## An atom:String.  May be cast to LV2_Atom.
+    ## An atom:String.  May be cast to Atom.
     AtomString* {.bycopy.} = object
         atom*: Atom  ## Atom header.
         ## Contents (a null-terminated UTF-8 string) follow here.
@@ -120,12 +105,12 @@ type
         lang*: uint32  ## Language URID.
         ## Contents (a null-terminated UTF-8 string) follow here.
 
-    ## An atom:Literal.  May be cast to LV2_Atom.
+    ## An atom:Literal.  May be cast to Atom.
     AtomLiteral* {.bycopy.} = object
         atom*: Atom  ## Atom header.
         body*: AtomLiteralBody  ## Body.
 
-    ## An atom:Tuple.  May be cast to LV2_Atom.
+    ## An atom:Tuple.  May be cast to Atom.
     AtomTuple* {.bycopy.} = object
         atom*: Atom  ## Atom header.
         ## Contents (a series of complete atoms) follow here.
@@ -136,7 +121,7 @@ type
         childType*: uint32  ## The of each element in the vector.
         ## Contents (a series of packed atom bodies) follow here.
 
-    ## An atom:Vector.  May be cast to LV2_Atom.
+    ## An atom:Vector.  May be cast to Atom.
     AtomVector* {.bycopy.} = object
         atom*: Atom  ## Atom header.
         body*: AtomVectorBody  ## Body.
@@ -148,23 +133,23 @@ type
         value*: Atom  ## Value atom header.
         ## Value atom body follows here.
 
-    ## An atom:Property.  May be cast to LV2_Atom.
+    ## An atom:Property.  May be cast to Atom.
     AtomProperty* {.bycopy.} = object
         atom*: Atom  ## Atom header.
         body*: AtomPropertyBody  ## Body.
 
-    ## The body of an atom:Object. May be cast to LV2_Atom.
+    ## The body of an atom:Object. May be cast to Atom.
     AtomObjectBody* {.bycopy.} = object
         id*: uint32  ## URID, or 0 for blank.
         otype*: uint32  ## URID (same as rdf:type, for fast dispatch).
         ## Contents (a series of property bodies) follow here.
 
-    ## An atom:Object.  May be cast to LV2_Atom.
+    ## An atom:Object.  May be cast to Atom.
     AtomObject* {.bycopy.} = object
         atom*: Atom  ## Atom header.
         body*: AtomObjectBody  ## Body.
 
-    ## The header of an atom:Event.  Note this is NOT an LV2_Atom.
+    ## The header of an atom:Event.  Note this is NOT an Atom.
     AtomEventTime* {.bycopy, union.} = object
         frames*: int64  ## Time in audio frames.
         beats*: cdouble  ## Time in beats.
@@ -175,13 +160,13 @@ type
         ## Body atom contents follow here.
 
     ##
-    ## The body of an atom:Sequence (a sequence of events).
+    ## The body of an AtomSequence (a sequence of events).
     ##
-    ## The unit field is either a URID that described an appropriate time stamp
+    ## The unit field is either a Urid that described an appropriate time stamp
     ## type, or may be 0 where a default stamp is known.  For
-    ## LV2_Descriptor::run(), the default stamp is audio frames.
+    ## lv2Descriptor.run(), the default stamp is audio frames.
     ##
-    ## The contents of a sequence is a series of LV2_Atom_Event, each aligned
+    ## The contents of a sequence is a series of AtomEvent, each aligned
     ## to 64-bits, for example:
     ## <pre>
     ## | Event 1 (size 6)                              | Event 2

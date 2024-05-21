@@ -1,4 +1,4 @@
-import ../nymph
+import core
 
 ## Return the data for a feature in a features array.
 

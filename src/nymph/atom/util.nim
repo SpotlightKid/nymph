@@ -12,14 +12,7 @@
 
 from system/ansi_c import c_memcmp, c_memcpy
 import ../atom
-
-
-##
-## Increment pointer `p` by `offset` that jumps memory in increments of
-## the size of `T`.
-##
-proc `+`*[T](p: ptr T, offset: SomeInteger): ptr T =
-    return cast[ptr T](cast[int](p) +% (offset.int * sizeof(T)))
+import ../ptrmath
 
 ##
 ## Pad a size to 64 bits.
@@ -73,7 +66,7 @@ proc atomSequenceIsEnd*(body: ptr AtomSequenceBody; size: Natural; i: ptr AtomEv
 ## Return an iterator to the element following `i`.
 ##
 proc atomSequenceNext*(i: ptr AtomEvent): ptr AtomEvent {.inline.} =
-    return cast[ptr AtomEvent](i + sizeof(AtomEvent) + atomPadSize(i.body.size))
+    return cast[ptr AtomEvent](cast[ptr uint8](i) + sizeof(AtomEvent) + atomPadSize(i.body.size))
 
 ##
 ## An iterator for looping over all events in a Sequence.

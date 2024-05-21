@@ -1,6 +1,8 @@
-## A simple MIDI event processor LV2 plugin
+## A simple MIDI transpose LV2 plugin
 
-import std/[math, strformat, strutils]
+import std/math
+#import std/strformat
+#import std/strutils
 import nymph/[atom, core, midi, util, urid]
 import nymph/atom/util
 
@@ -18,27 +20,17 @@ type
         midi_urid: Urid
 
 
-proc printFeatures(features: ptr UncheckedArray[ptr Lv2Feature]) =
-    if features != nil:
-        var i = 0
-        while true:
-            let feature = features[i]
-            if feature == nil:
-                break
-            echo &"URI: {feature[].uri}"
-            echo &"Data: {cast[int](feature[].data)}"
-            inc i
-
-
 proc instantiate(descriptor: ptr Lv2Descriptor; sampleRate: cdouble;
                  bundlePath: cstring; features: ptr UncheckedArray[ptr Lv2Feature]):
                  Lv2Handle {.cdecl.} =
-    printFeatures(features)
     let amp: ptr MidiTransposePlugin = createShared(MidiTransposePlugin)
     amp.map = cast[ptr UridMap](lv2FeaturesData(features, lv2UridMap))
-    assert amp.map != nil
+
+    if amp.map == nil:
+        return nil
+
     amp.midi_urid = amp.map[].map(amp.map[].handle, lv2MidiMidiEvent)
-    echo &"{lv2MidiMidiEvent} = {amp.midi_urid.int}"
+
     return cast[Lv2Handle](amp)
 
 
@@ -53,18 +45,33 @@ proc connectPort(instance: Lv2Handle; port: cuint;
     of PluginPort.Transposition:
         amp.transposition = cast[ptr cfloat](dataLocation)
 
+
 proc activate(instance: Lv2Handle) {.cdecl.} =
     discard
 
 
 proc run(instance: Lv2Handle; nSamples: cuint) {.cdecl.} =
     let amp = cast[ptr MidiTransposePlugin](instance)
+    let outCapacity = amp.output.atom.size
+    atomSequenceClear(amp.output)
+    amp.output.atom.type = amp.input.atom.type
+
     if amp.input.atom.size > 8:
+        #echo &"Event sequence size: {amp.input.atom.size}"
+
         for ev in items(amp.input):
             if Urid(ev.body.`type`) == amp.midi_urid:
-                # TODO
-                var msg = cast[ptr UncheckedArray[uint8]](ev.body.addr + 1)
-                echo &"0x{toHex(msg[0], 2)} 0x{toHex(msg[1], 2)} 0x{toHex(msg[2], 2)}"
+                var msg = cast[ptr UncheckedArray[uint8]](atomContents(AtomEvent, ev))
+                #echo &"0x{toHex(msg[0], 2)} 0x{toHex(msg[1], 2)} 0x{toHex(msg[2], 2)}"
+
+                case midiGetMessageType(msg[]):
+                of midiMsgNoteOff, midiMsgNoteOn, midiMsgNotePressure:
+                    let noteOffset = clamp(floor(amp.transposition[] + 0.5), -12, 12).uint8
+                    msg[1] = clamp(msg[1] + noteOffset, 0, 127).uint8
+                else:
+                    discard
+
+                discard atomSequenceAppendEvent(amp.output, outCapacity, ev)
 
 
 proc deactivate(instance: Lv2Handle) {.cdecl.} =
