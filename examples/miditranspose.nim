@@ -29,7 +29,7 @@ proc instantiate(descriptor: ptr Lv2Descriptor; sampleRate: cdouble;
     if amp.map == nil:
         return nil
 
-    amp.midi_urid = amp.map[].map(amp.map[].handle, lv2MidiMidiEvent)
+    amp.midi_urid = amp.map.map(amp.map.handle, lv2MidiMidiEvent)
 
     return cast[Lv2Handle](amp)
 
@@ -56,17 +56,17 @@ proc run(instance: Lv2Handle; nSamples: cuint) {.cdecl.} =
     atomSequenceClear(amp.output)
     amp.output.atom.type = amp.input.atom.type
 
-    if amp.input.atom.size > 8:
+    if not atomSequenceIsEmpty(amp.input):
         #echo &"Event sequence size: {amp.input.atom.size}"
+        let noteOffset = clamp(floor(amp.transposition[] + 0.5), -12, 12).uint8
 
-        for ev in items(amp.input):
-            if Urid(ev.body.`type`) == amp.midi_urid:
+        for ev in amp.input:
+            if ev.body.`type` == amp.midi_urid:
                 var msg = cast[ptr UncheckedArray[uint8]](atomContents(AtomEvent, ev))
                 #echo &"0x{toHex(msg[0], 2)} 0x{toHex(msg[1], 2)} 0x{toHex(msg[2], 2)}"
 
                 case midiGetMessageType(msg[]):
                 of midiMsgNoteOff, midiMsgNoteOn, midiMsgNotePressure:
-                    let noteOffset = clamp(floor(amp.transposition[] + 0.5), -12, 12).uint8
                     msg[1] = clamp(msg[1] + noteOffset, 0, 127).uint8
                 else:
                     discard

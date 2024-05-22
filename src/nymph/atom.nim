@@ -7,6 +7,7 @@
 ##
 
 import ptrmath
+import urid
 
 const
     lv2AtomBaseUri ="http://lv2plug.in/ns/ext/atom"
@@ -64,7 +65,7 @@ type
     ## The header of an atom:Atom.
     Atom* {.bycopy.} = object
         size*: uint32  ## Size in bytes, not including type and size.
-        `type`*: uint32  ## of this atom (mapped URI).
+        `type`*: Urid  ## Type of this atom (mapped URI).
 
     ## An atom:Int or atom:Bool.  May be cast to Atom.
     AtomInt* {.bycopy.} = object
@@ -92,7 +93,7 @@ type
     ## An atom:URID.  May be cast to Atom.
     AtomUrid* {.bycopy.} = object
         atom*: Atom  ## Atom header.
-        body*: uint32  ## URID.
+        body*: Urid  ## Urid.
 
     ## An atom:String.  May be cast to Atom.
     AtomString* {.bycopy.} = object
@@ -101,8 +102,8 @@ type
 
     ## The body of an atom:Literal.
     AtomLiteralBody* {.bycopy.} = object
-        datatype*: uint32  ## DataURID.
-        lang*: uint32  ## Language URID.
+        datatype*: Urid  ## Datatype Urid.
+        lang*: Urid  ## Language Urid.
         ## Contents (a null-terminated UTF-8 string) follow here.
 
     ## An atom:Literal.  May be cast to Atom.
@@ -128,8 +129,8 @@ type
 
     ## The body of an atom:Property (typically in an atom:Object).
     AtomPropertyBody* {.bycopy.} = object
-        key*: uint32  ## Key (predicate) (mapped URI).
-        context*: uint32  ## Context URID (may be, and generally is, 0).
+        key*: Urid  ## Key (predicate) (mapped URI).
+        context*: Urid  ## Context URID (may be, and generally is, 0).
         value*: Atom  ## Value atom header.
         ## Value atom body follows here.
 
@@ -140,8 +141,8 @@ type
 
     ## The body of an atom:Object. May be cast to Atom.
     AtomObjectBody* {.bycopy.} = object
-        id*: uint32  ## URID, or 0 for blank.
-        otype*: uint32  ## URID (same as rdf:type, for fast dispatch).
+        id*: Urid  ## Urid, or 0 for blank.
+        otype*: Urid  ## Urid (same as rdf:type, for fast dispatch).
         ## Contents (a series of property bodies) follow here.
 
     ## An atom:Object.  May be cast to Atom.
@@ -176,7 +177,7 @@ type
     ## </pre>
     ##
     AtomSequenceBody* {.bycopy.} = object
-        unit*: uint32  ## URID of unit of event time stamps.
+        unit*: Urid  ## Urid of unit of event time stamps.
         pad*: uint32  ## Currently unused.
         ## Contents (a series of events) follow here.
 

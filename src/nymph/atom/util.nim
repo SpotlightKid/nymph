@@ -13,6 +13,7 @@
 from system/ansi_c import c_memcmp, c_memcpy
 import ../atom
 import ../ptrmath
+import ../urid
 
 ##
 ## Pad a size to 64 bits.
@@ -31,7 +32,7 @@ proc atomTotalSize*(atom: ptr Atom): uint32 {.inline.} =
 ## Return true iff `atom` is null.
 ##
 proc atomIsNull*(atom: ptr Atom): bool {.inline.} =
-    return atom == nil or (atom.`type` == 0 and atom.size == 0)
+    return atom == nil or (atom.`type` == Urid(0) and atom.size == 0)
 
 ##
 ## Return true iff `a` is equal to `b`.
@@ -46,31 +47,30 @@ proc atomEquals*(a: ptr Atom; b: ptr Atom): bool {.inline.} =
 ##
 ## Get an iterator pointing to the first event in a Sequence body.
 ##
-proc atomSequenceBegin*(body: ptr AtomSequenceBody): ptr AtomEvent {.inline.} =
-    return cast[ptr AtomEvent](body + 1)
-
+template atomSequenceBegin*(body: ptr AtomSequenceBody): ptr AtomEvent =
+    cast[ptr AtomEvent](body + 1)
 
 ##
 ## Get an iterator pointing to the end of a Sequence body.
 ##
-proc atomSequenceEnd*(body: ptr AtomSequenceBody; size: uint32): ptr AtomEvent {.inline.} =
-    return cast[ptr AtomEvent](cast[ptr uint8](body) + atomPadSize(size))
+template atomSequenceEnd*(body: ptr AtomSequenceBody; size: Natural): ptr AtomEvent =
+    cast[ptr AtomEvent](cast[ptr uint8](body) + atomPadSize(size.uint32))
 
 ##
 ## Return true iff `i` has reached the end of `body`.
 ##
-proc atomSequenceIsEnd*(body: ptr AtomSequenceBody; size: Natural; i: ptr AtomEvent): bool {.inline.} =
-    return cast[ptr uint8](i) >= (cast[ptr uint8](body) + size.uint)
+template atomSequenceIsEnd*(body: ptr AtomSequenceBody; size: Natural; i: ptr AtomEvent): bool =
+    cast[ptr uint8](i) >= (cast[ptr uint8](body) + size.uint)
 
 ##
 ## Return an iterator to the element following `i`.
 ##
-proc atomSequenceNext*(i: ptr AtomEvent): ptr AtomEvent {.inline.} =
-    return cast[ptr AtomEvent](cast[ptr uint8](i) + sizeof(AtomEvent) + atomPadSize(i.body.size))
+template atomSequenceNext*(i: ptr AtomEvent): ptr AtomEvent =
+    cast[ptr AtomEvent](cast[ptr uint8](i) + sizeof(AtomEvent) + atomPadSize(i.body.size))
 
 ##
-## An iterator for looping over all events in a Sequence.
-## @param seq  The sequence to iterate over
+## An iterator for looping over all events in an AtomSequence.
+## @param seq  Pointer to the sequence to iterate over
 ##
 iterator items*(seq: ptr AtomSequence): ptr AtomEvent {.inline.} =
     var event = atomSequenceBegin(seq.body.addr)
@@ -78,10 +78,27 @@ iterator items*(seq: ptr AtomSequence): ptr AtomEvent {.inline.} =
         yield event
         event = atomSequenceNext(event)
 
-## TODO: Like LV2_ATOM_SEQUENCE_FOREACH but for a headerless sequence body.
+## 
+## An iterator for looping over all events in an AtomSequenceBody.
+## @param body  Pointer to the sequence body to iterate over
+## @param size  Size in bytes of the sequence body (including the 8 bytes of AtomSequenceBody)
+## 
+iterator items*(body: ptr AtomSequenceBody, size: Natural): ptr AtomEvent {.inline.} =
+    var event = atomSequenceBegin(body)
+    while not atomSequenceIsEnd(body, size, event):
+        yield event
+        event = atomSequenceNext(event)
 
 ##
 ## Sequence Utilities
+##
+
+##
+## Test if AtomSequence is empty, i.e the body has no events
+##
+template atomSequenceIsEmpty*(seq: ptr AtomSequence): bool =
+    seq.atom.size == sizeof(AtomSequenceBody).uint32
+
 ##
 ## Clear all events from `sequence`.
 ##
@@ -118,48 +135,60 @@ proc atomSequenceAppendEvent*(seq: ptr AtomSequence; capacity: uint32;
 ##
 ## Get an iterator pointing to the first element in `tup`.
 ##
-proc atomTupleBegin*(tup: ptr AtomTuple): ptr Atom {.inline.} =
-    return cast[ptr Atom](atomContents(Atom, tup))
+template atomTupleBegin*(tup: ptr AtomTuple): ptr Atom =
+    cast[ptr Atom](atomContents(Atom, tup))
 
 ##
 ## Return true iff `i` has reached the end of `body`.
 ##
-proc atomTupleIsEnd*(body: pointer; size: Natural; i: ptr Atom): bool {.inline.} =
-    return cast[ptr uint8](i) >= (cast[ptr uint8](body) + size.int)
+template atomTupleIsEnd*(body: pointer; size: Natural; i: ptr Atom): bool =
+    cast[ptr uint8](i) >= (cast[ptr uint8](body) + size.uint)
 
 ##
 ## Return an iterator to the element following `i`.
 ##
-proc atomTupleNext*(i: ptr Atom): ptr Atom {.inline.} =
-    return cast[ptr Atom](cast[ptr uint8](i) + sizeof(Atom) + atomPadSize(i.size))
+template atomTupleNext*(i: ptr Atom): ptr Atom =
+    cast[ptr Atom](cast[ptr uint8](i) + sizeof(Atom) + atomPadSize(i.size))
 
-
-## TODO:
 ##
-## A iterator for looping over all properties of a Tuple.
-## @param tuple The tuple to iterate over
+## An iterator for looping over all elements of an AtomTuple.
+## @param tuple Pointer to the tuple to iterate over
+##
+iterator items*(tup: ptr AtomTuple): ptr Atom {.inline.} =
+    var atom = atomTupleBegin(tup)
+    while not atomTupleIsEnd(atomBody(tup), tup.atom.size, atom):
+        yield atom
+        atom = atomTupleNext(atom)
 
-## TODO: 
-## Like LV2_ATOM_TUPLE_FOREACH but for a headerless tuple body.
+##
+## An iterator for looping over all elements of a headerless tuple.
+## @param tuple Pointer to the first Atom of the tuple to iterate over
+## @param size  Size in bytes of the tuple body
+##
+iterator items*(tup: ptr Atom, size: Natural): ptr Atom {.inline.} =
+    var atom = tup
+    while not atomTupleIsEnd(tup, size, atom):
+        yield atom
+        atom = atomTupleNext(atom)
 
 ##
 ## Object Iterator
 ##
 ## Return a pointer to the first property in `body`.
 ##
-proc atomObjectBegin*(body: ptr AtomObjectBody): ptr AtomPropertyBody {.inline.} =
-    return cast[ptr AtomPropertyBody](body + 1)
+template atomObjectBegin*(body: ptr AtomObjectBody): ptr AtomPropertyBody =
+    cast[ptr AtomPropertyBody](body + 1)
 
 ##
 ## Return true iff `i` has reached the end of `obj`.
 ##
-proc atomObjectIsEnd*(body: ptr AtomObjectBody; size: Natural; i: ptr AtomPropertyBody): bool {.inline.} =
-    return cast[ptr uint8](i) >= (cast[ptr uint8](body) + size.int)
+template atomObjectIsEnd*(body: ptr AtomObjectBody; size: Natural; i: ptr AtomPropertyBody): bool =
+    cast[ptr uint8](i) >= (cast[ptr uint8](body) + size.uint)
 
 ##
 ## Return an iterator to the property following `i`.
 ##
-proc atomObjectNext*(i: ptr AtomPropertyBody): ptr AtomPropertyBody {.inline.} =
+template atomObjectNext*(i: ptr AtomPropertyBody): ptr AtomPropertyBody =
     let value = cast[ptr Atom](cast[ptr uint8](i) + 2 * sizeof(uint32))
     return cast[ptr AtomPropertyBody](cast[ptr uint8](i) + atomPadSize(sizeof(AtomPropertyBody).uint32 + value.size))
 
