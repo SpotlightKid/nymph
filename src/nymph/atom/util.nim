@@ -10,7 +10,6 @@
 ## Utilities for working with atoms.
 ##
 
-from system/ansi_c import c_memcmp, c_memcpy
 import ../atom
 import ../ptrmath
 import ../urid
@@ -40,7 +39,7 @@ proc atomIsNull*(atom: ptr Atom): bool {.inline.} =
 proc atomEquals*(a: ptr Atom; b: ptr Atom): bool {.inline.} =
     return (a == b) or
         ((a.`type` == b.`type`) and (a.size == b.size) and
-        c_memcmp(a + 1, b + 1, a.size) == 0)
+        cmpMem(a + 1, b + 1, a.size) == 0)
 
 ##
 ## Sequence Iterator
@@ -126,7 +125,7 @@ proc atomSequenceAppendEvent*(seq: ptr AtomSequence; capacity: uint32;
         return nil
     
     var e = atomSequenceEnd(seq.body.addr, seq.atom.size)
-    c_memcpy(e, event, totalSize)
+    copyMem(e, event, totalSize)
     seq.atom.size += atomPadSize(totalSize)
     return e
 
