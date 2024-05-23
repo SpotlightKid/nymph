@@ -163,18 +163,19 @@ type
     ##
     ## The body of an AtomSequence (a sequence of events).
     ##
-    ## The unit field is either a Urid that described an appropriate time stamp
-    ## type, or may be 0 where a default stamp is known.  For
-    ## lv2Descriptor.run(), the default stamp is audio frames.
+    ## The unit field is either a Urid that describes an appropriate time stamp
+    ## type, or may be 0 where a default stamp type is known.  For
+    ## lv2Descriptor.run(), the default stamp type is audio frames.
     ##
     ## The contents of a sequence is a series of AtomEvent, each aligned
     ## to 64-bits, for example:
-    ## <pre>
+    ## 
+    ## ```
     ## | Event 1 (size 6)                              | Event 2
     ## |       |       |       |       |       |       |       |       |
     ## | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | |
     ## |FRAMES         |SIZE   |TYPE   |DATADATADATAPAD|FRAMES         |...
-    ## </pre>
+    ## ```
     ##
     AtomSequenceBody* {.bycopy.} = object
         unit*: Urid  ## Urid of unit of event time stamps.
