@@ -3,10 +3,6 @@
 ##
 ## Helper functions for the LV2 Atom extension.
 ##
-## Note these functions are all static inline, do not take their address.
-##
-## This header is non-normative, it is provided for convenience.
-##
 ## Utilities for working with atoms.
 ##
 
