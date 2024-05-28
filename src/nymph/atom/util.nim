@@ -99,7 +99,7 @@ template atomSequenceIsEmpty*(seq: ptr AtomSequence): bool =
 ##
 ## This simply resets the size field, the other fields are left untouched.
 ##
-proc atomSequenceClear*(seq: ptr AtomSequence) {.inline.} =
+template atomSequenceClear*(seq: ptr AtomSequence) =
     seq.atom.size = sizeof(AtomSequenceBody).uint32
 
 ##
@@ -111,7 +111,7 @@ proc atomSequenceClear*(seq: ptr AtomSequence) {.inline.} =
 ## @param event Event to write.
 ##
 ## @return A pointer to the newly written event in `seq`,
-## or NULL on failure (insufficient space).
+## or nil on failure (insufficient space).
 ##
 proc atomSequenceAppendEvent*(seq: ptr AtomSequence; capacity: uint32;
                               event: ptr AtomEvent): ptr AtomEvent {.inline.} =
