@@ -7,11 +7,11 @@ import core
 ## present but have nil data.
 
 proc lv2FeaturesData*(features: ptr UncheckedArray[ptr Lv2Feature], uri: string): pointer =
-    if features != nil:
+    if not features.isNil:
         var i = 0
         while true:
             let feature = features[i]
-            if feature == nil:
+            if feature.isNil:
                 break
             
             if feature[].uri == uri.cstring:

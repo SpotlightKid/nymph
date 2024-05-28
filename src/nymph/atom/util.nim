@@ -31,7 +31,7 @@ proc atomTotalSize*(atom: ptr Atom): uint32 {.inline.} =
 ## Return true iff `atom` is null.
 ##
 proc atomIsNull*(atom: ptr Atom): bool {.inline.} =
-    return atom == nil or (atom.`type` == Urid(0) and atom.size == 0)
+    return atom.isNil or (atom.`type` == Urid(0) and atom.size == 0)
 
 ##
 ## Return true iff `a` is equal to `b`.

@@ -26,7 +26,8 @@ proc instantiate(descriptor: ptr Lv2Descriptor; sampleRate: cdouble;
     let amp: ptr MidiTransposePlugin = createShared(MidiTransposePlugin)
     amp.map = cast[ptr UridMap](lv2FeaturesData(features, lv2UridMap))
 
-    if amp.map == nil:
+    if amp.map.isNil:
+        freeShared(amp)
         return nil
 
     amp.midi_urid = amp.map.map(amp.map.handle, lv2MidiMidiEvent)
