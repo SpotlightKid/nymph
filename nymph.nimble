@@ -26,7 +26,8 @@ type Example = tuple
 const examples = to_table({
     "amp": "urn:nymph:examples:amp",
     "miditranspose": "urn:nymph:examples:miditranspose",
-    "multimodefilter": "urn:nymph:examples:multimode-filter",
+    "multimodefilter": "urn:nymph:examples:multimodefilter",
+    "tiltfilter": "urn:nymph:examples:tiltfilter",
 })
 
 
