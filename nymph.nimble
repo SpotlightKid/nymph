@@ -25,8 +25,8 @@ type Example = tuple
 
 const examples = to_table({
     "amp": "urn:nymph:examples:amp",
-    "multimode_filter": "urn:nymph:examples:multimode-filter",
     "miditranspose": "urn:nymph:examples:miditranspose",
+    "multimodefilter": "urn:nymph:examples:multimode-filter",
 })
 
 
@@ -48,7 +48,7 @@ proc getExample(task_name: string): Example =
     result.name = changeFileExt(args[^1], "")
 
     let examplesDir = thisDir() / "examples"
-    result.source = examplesDir / changeFileExt(result.name, "nim")
+    result.source = examplesDir / result.name & "_plugin.nim"
 
     if not fileExists(result.source):
         quit(&"Example '{result.name}' not found.")

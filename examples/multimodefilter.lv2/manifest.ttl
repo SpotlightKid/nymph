@@ -3,6 +3,6 @@
 
 <urn:nymph:examples:multimode-filter>
     a lv2:Plugin ;
-    lv2:binary <libmultimode_filter.so> ;
-    rdfs:seeAlso <multimode_filter.ttl> .
+    lv2:binary <libmultimodefilter.so> ;
+    rdfs:seeAlso <multimodefilter.ttl> .
 

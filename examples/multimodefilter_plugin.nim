@@ -5,7 +5,7 @@ import nymph
 import paramsmooth
 import svf
 
-const PluginUri = "urn:nymph:examples:multimode-filter"
+const PluginUri = "urn:nymph:examples:multimodefilter"
 
 type
     SampleBuffer = UncheckedArray[cfloat]
@@ -19,7 +19,7 @@ type
         cutoff: ptr cfloat
         q: ptr cfloat
         mode: ptr cfloat
-        svf: FilterSV
+        svf: SVFilter
         smoothCutoff: ParamSmooth
 
 
@@ -28,7 +28,7 @@ proc instantiate(descriptor: ptr Lv2Descriptor; sampleRate: cdouble;
                  Lv2Handle {.cdecl.} =
     try:
         let plug = createShared(SVFPlugin)
-        plug.svf = initFilterSV(fmLowPass, sampleRate)
+        plug.svf = initSVFilter(fmLowPass, sampleRate)
         plug.smoothCutoff = initParamSmooth(20.0, sampleRate)
         return cast[Lv2Handle](plug)
     except OutOfMemDefect:

@@ -2,3 +2,4 @@ nimble.paths
 *.so
 *.dll
 /.lv2/
+*.code-workspace

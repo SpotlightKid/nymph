@@ -8,7 +8,7 @@
 @prefix units: <http://lv2plug.in/ns/extensions/units#> .
 
 <urn:nymph:examples:amp>
-    a lv2:Plugin, lv2:AmplifierPlugin , doap:Project ;
+    a lv2:Plugin , lv2:AmplifierPlugin , doap:Project ;
 
     lv2:optionalFeature lv2:hardRTCapable , bufs:boundedBlockLength , opts:options ;
 

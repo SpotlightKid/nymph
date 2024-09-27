@@ -19,6 +19,11 @@ type
         map: ptr UridMap
         midi_urid: Urid
 
+    MidiEvent = object
+        size: uint32
+        frames: int64
+        data: ptr UncheckedArray[byte]
+
 
 proc instantiate(descriptor: ptr Lv2Descriptor; sampleRate: cdouble;
                  bundlePath: cstring; features: ptr UncheckedArray[ptr Lv2Feature]):

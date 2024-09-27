@@ -9,8 +9,8 @@
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix units: <http://lv2plug.in/ns/extensions/units#> .
 
-<urn:nymph:examples:multimode-filter>
-    a lv2:Plugin, lv2:AmplifierPlugin , doap:Project ;
+<urn:nymph:examples:multimodefilter>
+    a lv2:Plugin , lv2:FilterPlugin , doap:Project ;
 
     lv2:optionalFeature lv2:hardRTCapable , bufs:boundedBlockLength , opts:options ;
 
