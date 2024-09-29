@@ -2,24 +2,21 @@
 
 import nymph
 
+{.emit: "#include \"lpf.h\"".}
+
+const
+    PluginUri = "urn:nymph:examples:faustlpf"
+    minFreq = 16.0
+    maxFreq = 15_000.0
+
 type
     SampleBuffer = UncheckedArray[cfloat]
 
-{.emit: "#include \"lpf.h\"".}
-type
-    faustlpf {.importc, header: "lpf.h".}= object
+    faustlpf {.importc, header: "lpf.h".} = object
+        # struct field, which represents the value of the
+        # FAUST UI element, which controls the cutoff
         fHslider0: cfloat
 
-proc newfaustlpf(): ptr faustlpf {.importc.}
-proc deletefaustlpf(dsp: ptr faustlpf) {.importc.}
-proc initfaustlpf(dsp: ptr faustlpf, sample_rate: cint) {.importc.}
-proc instanceClearfaustlpf(dsp: ptr faustlpf) {.importc.}
-#proc getNumInputsmydsp(dsp: ptr faustlpf): cint {.importc.}
-#proc getNumOutputsmydsp(dsp: ptr faustlpf): cint {.importc.}
-#proc getSampleRatefaustlpf(dsp: ptr faustlpf): cint {.importc.}
-proc computefaustlpf(dsp: ptr faustlpf, count: cint, inputs, outputs: ptr ptr SampleBuffer) {.importc.}
-
-type
     PluginPort {.pure.} = enum
         Input, Output, Frequency
 
@@ -30,10 +27,12 @@ type
         flt: ptr faustlpf
 
 
-const
-    PluginUri = "urn:nymph:examples:faustlpf"
-    minFreq = 16.0
-    maxFreq = 15_000.0
+# wrap only those functions from the C code, which we actually need
+proc newfaustlpf(): ptr faustlpf {.importc.}
+proc deletefaustlpf(dsp: ptr faustlpf) {.importc.}
+proc initfaustlpf(dsp: ptr faustlpf, sample_rate: cint) {.importc.}
+proc instanceClearfaustlpf(dsp: ptr faustlpf) {.importc.}
+proc computefaustlpf(dsp: ptr faustlpf, count: cint, inputs, outputs: ptr ptr SampleBuffer) {.importc.}
 
 
 proc instantiate(descriptor: ptr Lv2Descriptor; sampleRate: cdouble;
