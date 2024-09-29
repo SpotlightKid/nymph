@@ -22,12 +22,19 @@ Install the `amp.lv2` example plugin:
     cp -a examples/amp.lv2 ~/.lv2
 
 Other example plugins can be found in the [examples](./examples) directory and
-can be built and tested with similar commands, just changing the example name
-to the basename of the plugin's LV2 bundle dir.
+can be built and tested with similar commands. Just change the example name to
+the basename of the plugin's LV2 bundle dir.
 
-Currently, there are only two other example plugins, `multimode_filter` and
-`miditranspose`, but more will be added in due time.
+Currently, there are just a few other example plugins:
 
+* `miditranspose`: shows how to handle receiving and sending MIDI events.
+* `multimodefilter`: shows a multimode state-variable filter implementation
+  ported from C++ to Nim.
+* `tiltfilter`: shows a multimode tilt equalizer filter implementation ported
+  from Rust to Nim.
+* `faustlpf`: shows how to integrate DSP C code generated from a [FAUST]
+  source file in Nim (in this example the FAUST code implements a simple
+  non-resonant low-pass filter from the FAUST standard library).
 
 ## How To
 
@@ -67,7 +74,7 @@ Currently, there are only two other example plugins, `multimode_filter` and
             --out:myplugin.lv2/libmyplugin.so myplugin.nim
 
     See the definition of the `build_ex` task in the
-    [nymph.nimble](./nymph.nimble#L43) file on how to create a nimble task
+    [nymph.nimble](./nymph.nimble#L67) file on how to create a nimble task
     to simplify compilation.
 
 
@@ -83,8 +90,8 @@ Optional:
 * [lv2lint] - For checking conformity of plugin bundles
 
 
+[FAUST]: https://faust.grame.fr/
 [LV2]: https://lv2plug.in/
 [lv2bm]: https://github.com/moddevices/lv2bm
 [lv2lint]: https://git.open-music-kontrollers.ch/~hp/lv2lint
 [Nim]: https://nim-lang.org/
-
