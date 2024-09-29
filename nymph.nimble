@@ -72,6 +72,9 @@ task build_ex, "Build given example plugin":
     switch("mm", "arc")
     switch("out", ex.dll)
 
+    when defined(gcc):
+        switch("passC", "-fvisibility=hidden")
+
     when not defined(release) and not defined(debug):
         echo &"Compiling plugin {ex.name} in release mode."
         switch("define", "release")
@@ -115,4 +118,3 @@ task lv2bm, "Run lv2bm benchmark on given example plugin":
         exec(&"lv2bm --full-test -i white \"{ex.uri}\"")
     else:
         echo &"Example '{ex.name}' shared library not found. Use task 'build_ex' to build it."
-
