@@ -5,7 +5,7 @@ license: "MIT"
 name: "FaustLPF"
 version: "0.1.0"
 Code generated with Faust 2.74.6 (https://faust.grame.fr)
-Compilation options: -a ./examples/minarch.h -lang c -ct 1 -cn faustlpf -es 1 -mcd 16 -mdd 1024 -mdy 33 -single -ftz 0 -vec -lv 0 -vs 32
+Compilation options: -a ./examples/minarch.h -lang c -rui -ct 1 -fm def -cn faustlpf -es 1 -mcd 16 -mdd 1024 -mdy 33 -single -ftz 0 -vec -lv 0 -vs 32
 ------------------------------------------------------------ */
 
 #ifndef  __faustlpf_H__
@@ -17,13 +17,7 @@ Compilation options: -a ./examples/minarch.h -lang c -ct 1 -cn faustlpf -es 1 -m
  FAUST Architecture File for generating a very minimal C interface
  ************************************************************************/
 
-#include <math.h>
-#include <stdio.h>
-
 #include "faust/gui/CInterface.h"
-
-#define max(a,b) ((a < b) ? b : a)
-#define min(a,b) ((a < b) ? a : b)
 
 /******************************************************************************
  VECTOR INTRINSICS
@@ -47,6 +41,7 @@ extern "C" {
 #define RESTRICT __restrict__
 #endif
 
+#include "faust/dsp/fastmath.cpp"
 #include <math.h>
 #include <stdint.h>
 #include <stdlib.h>
@@ -86,7 +81,7 @@ void deletefaustlpf(faustlpf* dsp) {
 
 void metadatafaustlpf(MetaGlue* m) { 
 	m->declare(m->metaInterface, "author", "Christopher Arndt");
-	m->declare(m->metaInterface, "compile_options", "-a ./examples/minarch.h -lang c -ct 1 -cn faustlpf -es 1 -mcd 16 -mdd 1024 -mdy 33 -single -ftz 0 -vec -lv 0 -vs 32");
+	m->declare(m->metaInterface, "compile_options", "-a ./examples/minarch.h -lang c -rui -ct 1 -fm def -cn faustlpf -es 1 -mcd 16 -mdd 1024 -mdy 33 -single -ftz 0 -vec -lv 0 -vs 32");
 	m->declare(m->metaInterface, "copyright", "Christopher Arndt, 2024");
 	m->declare(m->metaInterface, "filename", "lpf.dsp");
 	m->declare(m->metaInterface, "filters.lib/fir:author", "Julius O. Smith III");
@@ -191,7 +186,7 @@ void buildUserInterfacefaustlpf(faustlpf* dsp, UIGlue* ui_interface) {
 void computefaustlpf(faustlpf* dsp, int count, FAUSTFLOAT** RESTRICT inputs, FAUSTFLOAT** RESTRICT outputs) {
 	FAUSTFLOAT* input0_ptr = inputs[0];
 	FAUSTFLOAT* output0_ptr = outputs[0];
-	float fSlow0 = dsp->fConst1 * (float)(dsp->fHslider0);
+	float fSlow0 = dsp->fConst1 * fmaxf(16.0f, fminf(1.5e+04f, (float)(dsp->fHslider0)));
 	float fRec1_tmp[36];
 	float* fRec1 = &fRec1_tmp[4];
 	float fZec0[32];
@@ -236,7 +231,7 @@ void computefaustlpf(faustlpf* dsp, int count, FAUSTFLOAT** RESTRICT inputs, FAU
 		{
 			int i;
 			for (i = 0; i < vsize; i = i + 1) {
-				fZec0[i] = tanf(dsp->fConst3 * fRec1[i]);
+				fZec0[i] = fast_tanf(dsp->fConst3 * fRec1[i]);
 			}
 		}
 		/* Vectorizable loop 2 */
@@ -328,7 +323,7 @@ void computefaustlpf(faustlpf* dsp, int count, FAUSTFLOAT** RESTRICT inputs, FAU
 		{
 			int i;
 			for (i = 0; i < vsize; i = i + 1) {
-				fZec0[i] = tanf(dsp->fConst3 * fRec1[i]);
+				fZec0[i] = fast_tanf(dsp->fConst3 * fRec1[i]);
 			}
 		}
 		/* Vectorizable loop 2 */

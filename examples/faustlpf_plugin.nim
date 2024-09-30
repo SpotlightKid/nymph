@@ -2,23 +2,21 @@
 
 import nymph
 
-{.emit: "#include \"lpf.h\"".}
+{.emit: """#include "lpf.h"""".}
 
 const
     PluginUri = "urn:nymph:examples:faustlpf"
-    minFreq = 16.0
-    maxFreq = 15_000.0
 
 type
-    SampleBuffer = UncheckedArray[cfloat]
-
     faustlpf {.importc, header: "lpf.h".} = object
-        # struct field, which represents the value of the
-        # FAUST UI element, which controls the cutoff
+        # struct field representing the value of the FAUST UI element,
+        # which controls the filter cutoff frequency
         fHslider0: cfloat
 
     PluginPort {.pure.} = enum
         Input, Output, Frequency
+
+    SampleBuffer = UncheckedArray[cfloat]
 
     FaustLPFPlugin = object
         input: ptr SampleBuffer
@@ -33,6 +31,8 @@ proc deletefaustlpf(dsp: ptr faustlpf) {.importc.}
 proc initfaustlpf(dsp: ptr faustlpf, sample_rate: cint) {.importc.}
 proc instanceClearfaustlpf(dsp: ptr faustlpf) {.importc.}
 proc computefaustlpf(dsp: ptr faustlpf, count: cint, inputs, outputs: ptr ptr SampleBuffer) {.importc.}
+
+proc NimMain() {.cdecl, importc.}
 
 
 proc instantiate(descriptor: ptr Lv2Descriptor; sampleRate: cdouble;
@@ -66,8 +66,7 @@ proc activate(instance: Lv2Handle) {.cdecl.} =
 
 proc run(instance: Lv2Handle; nSamples: cuint) {.cdecl.} =
     let plug = cast[ptr FaustLPFPlugin](instance)
-    plug.flt.fHslider0 = plug.freq[].clamp(minFreq, maxFreq)
-
+    plug.flt.fHslider0 = plug.freq[]
     computefaustlpf(plug.flt, nSamples.cint, addr plug.input, addr plug.output)
 
 
@@ -83,9 +82,6 @@ proc cleanup(instance: Lv2Handle) {.cdecl.} =
 
 proc extensionData(uri: cstring): pointer {.cdecl.} =
     return nil
-
-
-proc NimMain() {.cdecl, importc.}
 
 
 proc lv2Descriptor(index: cuint): ptr Lv2Descriptor {.
