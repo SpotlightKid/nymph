@@ -99,6 +99,15 @@ Optional:
 * [lv2lint] - For checking conformity of plugin bundles
 
 
+## See Also
+
+* [lv2-nim](https://gitlab.com/lpirl/lv2-nim) - Older third-party Nim bindings
+  for the LV2 audio plugin specification. Last update in 2021.
+* [offbeat](https://github.com/NimAudio/offbeat) - A [CLAP] based plugin
+  framework in Nim
+
+
+[CLAP]: https://cleveraudio.org/
 [FAUST]: https://faust.grame.fr/
 [LV2]: https://lv2plug.in/
 [lv2bm]: https://github.com/moddevices/lv2bm
