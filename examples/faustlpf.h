@@ -160,7 +160,7 @@ bool parameter_is_logarithmic(unsigned index) {
     }
 }
 
-float get_parameter(faustlpf* dsp, unsigned index) {
+FAUSTFLOAT get_parameter(faustlpf* dsp, unsigned index) {
     switch (index) {
     
     case 0:
@@ -172,7 +172,7 @@ float get_parameter(faustlpf* dsp, unsigned index) {
     }
 }
 
-void set_parameter(faustlpf* dsp, unsigned index, float value) {
+void set_parameter(faustlpf* dsp, unsigned index, FAUSTFLOAT value) {
     switch (index) {
     
     case 0:
@@ -187,12 +187,12 @@ void set_parameter(faustlpf* dsp, unsigned index, float value) {
 }
 
 
-float get_cutoff(faustlpf* dsp) {
+FAUSTFLOAT get_cutoff(faustlpf* dsp) {
     return dsp->fHslider0;
 }
 
 
-void set_cutoff(faustlpf* dsp, float value) {
+void set_cutoff(faustlpf* dsp, FAUSTFLOAT value) {
     dsp->fHslider0 = value;
 }
 
