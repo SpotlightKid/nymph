@@ -1,36 +1,20 @@
 ## A FAUST standard library 2-pole lowpass filter LV2 plugin
 
 import nymph
-
-{.emit: """#include "lpf.h"""".}
+import faustlpf
 
 const
     PluginUri = "urn:nymph:examples:faustlpf"
 
 type
-    faustlpf {.importc, header: "lpf.h".} = object
-        # struct field representing the value of the FAUST UI element,
-        # which controls the filter cutoff frequency
-        fHslider0: cfloat
-
     PluginPort {.pure.} = enum
         Input, Output, Frequency
-
-    SampleBuffer = UncheckedArray[cfloat]
 
     FaustLPFPlugin = object
         input: ptr SampleBuffer
         output: ptr SampleBuffer
         freq: ptr cfloat
         flt: ptr faustlpf
-
-
-# wrap only those functions from the C code, which we actually need
-proc newfaustlpf(): ptr faustlpf {.importc.}
-proc deletefaustlpf(dsp: ptr faustlpf) {.importc.}
-proc initfaustlpf(dsp: ptr faustlpf, sample_rate: cint) {.importc.}
-proc instanceClearfaustlpf(dsp: ptr faustlpf) {.importc.}
-proc computefaustlpf(dsp: ptr faustlpf, count: cint, inputs, outputs: ptr ptr SampleBuffer) {.importc.}
 
 proc NimMain() {.cdecl, importc.}
 
@@ -66,7 +50,7 @@ proc activate(instance: Lv2Handle) {.cdecl.} =
 
 proc run(instance: Lv2Handle; nSamples: cuint) {.cdecl.} =
     let plug = cast[ptr FaustLPFPlugin](instance)
-    plug.flt.fHslider0 = plug.freq[]
+    set_cutoff(plug.flt, plug.freq[])
     computefaustlpf(plug.flt, nSamples.cint, addr plug.input, addr plug.output)
 
 

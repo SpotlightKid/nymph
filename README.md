@@ -82,9 +82,9 @@ below.
         nim c --app:lib --noMain:on --mm:arc \
             --out:mydsp.lv2/libmydsp.so mydsp_plugin.nim
 
-    See the definition of the `build_ex` task in the
-    [nymph.nimble](./nymph.nimble#L67) file on how to create a nimble task
-    to simplify compilation.
+   See the definition of the `build_ex` task in the
+   [nymph.nimble](./nymph.nimble#L67) file on how to create a nimble task
+   to simplify compilation and additional compiler args you might want to use.
 
 
 ## Dependencies

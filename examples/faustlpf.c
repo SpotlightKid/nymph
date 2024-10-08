@@ -1,31 +1,38 @@
-/* ------------------------------------------------------------
-author: "Christopher Arndt"
-copyright: "Christopher Arndt, 2024"
-license: "MIT"
-name: "FaustLPF"
-version: "0.1.0"
-Code generated with Faust 2.74.6 (https://faust.grame.fr)
-Compilation options: -a ./examples/minarch.h -lang c -rui -ct 1 -cn faustlpf -es 1 -mcd 16 -mdd 1024 -mdy 33 -single -ftz 0 -vec -lv 0 -vs 32
------------------------------------------------------------- */
 
-#ifndef  __faustlpf_H__
-#define  __faustlpf_H__
-
-/******************* BEGIN minarch.h ****************/
-
-/************************************************************************
- FAUST Architecture File for generating a very minimal C interface
- ************************************************************************/
-
-#include "faust/gui/CInterface.h"
-
-/******************************************************************************
- VECTOR INTRINSICS
-*******************************************************************************/
+//------------------------------------------------------------------------------
+// This file was generated using the Faust compiler (https://faust.grame.fr),
+// and the Faust post-processor (https://github.com/SpotlightKid/faustpp).
+//
+// Source: lpf.dsp
+// Name: FaustLPF
+// Author: Christopher Arndt
+// Copyright: Christopher Arndt, 2024
+// License: MIT
+// Version: 0.1.0
+// FAUST version: 2.75.10
+// FAUST compilation options: -a /home/chris/tmp/tmp9v2ck7tz.c -lang c -rui -ct 1 -fm def -cn faustlpf -es 1 -mcd 16 -mdd 1024 -mdy 33 -single -ftz 0 -vec -lv 0 -vs 32
+//------------------------------------------------------------------------------
 
 
-/**************************BEGIN USER SECTION **************************/
 
+
+#include "faustlpf.h"
+
+
+
+
+//------------------------------------------------------------------------------
+// Begin the Faust code section
+
+
+#if defined(__GNUC__)
+#   pragma GCC diagnostic push
+#   pragma GCC diagnostic ignored "-Wunused-parameter"
+#endif
+
+// START INTRINSICS
+// END INTRINSICS
+// START CLASS CODE
 #ifndef FAUSTFLOAT
 #define FAUSTFLOAT float
 #endif 
@@ -41,6 +48,7 @@ extern "C" {
 #define RESTRICT __restrict__
 #endif
 
+#include "faust/dsp/fastmath.cpp"
 #include <math.h>
 #include <stdint.h>
 #include <stdlib.h>
@@ -58,16 +66,7 @@ static float faustlpf_faustpower2_f(float value) {
 #define exp10 __exp10
 #endif
 
-typedef struct {
-	int fSampleRate;
-	float fConst0;
-	float fConst1;
-	float fConst2;
-	FAUSTFLOAT fHslider0;
-	float fRec1_perm[4];
-	float fConst3;
-	float fRec0_perm[4];
-} faustlpf;
+
 
 faustlpf* newfaustlpf() { 
 	faustlpf* dsp = (faustlpf*)calloc(1, sizeof(faustlpf));
@@ -80,7 +79,7 @@ void deletefaustlpf(faustlpf* dsp) {
 
 void metadatafaustlpf(MetaGlue* m) { 
 	m->declare(m->metaInterface, "author", "Christopher Arndt");
-	m->declare(m->metaInterface, "compile_options", "-a ./examples/minarch.h -lang c -rui -ct 1 -cn faustlpf -es 1 -mcd 16 -mdd 1024 -mdy 33 -single -ftz 0 -vec -lv 0 -vs 32");
+	m->declare(m->metaInterface, "compile_options", "-a /home/chris/tmp/tmp9v2ck7tz.c -lang c -rui -ct 1 -fm def -cn faustlpf -es 1 -mcd 16 -mdd 1024 -mdy 33 -single -ftz 0 -vec -lv 0 -vs 32");
 	m->declare(m->metaInterface, "copyright", "Christopher Arndt, 2024");
 	m->declare(m->metaInterface, "filename", "lpf.dsp");
 	m->declare(m->metaInterface, "filters.lib/fir:author", "Julius O. Smith III");
@@ -112,7 +111,7 @@ void metadatafaustlpf(MetaGlue* m) {
 	m->declare(m->metaInterface, "platform.lib/name", "Generic Platform Library");
 	m->declare(m->metaInterface, "platform.lib/version", "1.3.0");
 	m->declare(m->metaInterface, "signals.lib/name", "Faust Signal Routing Library");
-	m->declare(m->metaInterface, "signals.lib/version", "1.5.0");
+	m->declare(m->metaInterface, "signals.lib/version", "1.6.0");
 	m->declare(m->metaInterface, "version", "0.1.0");
 }
 
@@ -230,7 +229,7 @@ void computefaustlpf(faustlpf* dsp, int count, FAUSTFLOAT** RESTRICT inputs, FAU
 		{
 			int i;
 			for (i = 0; i < vsize; i = i + 1) {
-				fZec0[i] = tanf(dsp->fConst3 * fRec1[i]);
+				fZec0[i] = fast_tanf(dsp->fConst3 * fRec1[i]);
 			}
 		}
 		/* Vectorizable loop 2 */
@@ -322,7 +321,7 @@ void computefaustlpf(faustlpf* dsp, int count, FAUSTFLOAT** RESTRICT inputs, FAU
 		{
 			int i;
 			for (i = 0; i < vsize; i = i + 1) {
-				fZec0[i] = tanf(dsp->fConst3 * fRec1[i]);
+				fZec0[i] = fast_tanf(dsp->fConst3 * fRec1[i]);
 			}
 		}
 		/* Vectorizable loop 2 */
@@ -383,7 +382,15 @@ void computefaustlpf(faustlpf* dsp, int count, FAUSTFLOAT** RESTRICT inputs, FAU
 #ifdef __cplusplus
 }
 #endif
+// END CLASS CODE
 
-/***************************END USER SECTION ***************************/
 
+#if defined(__GNUC__)
+#   pragma GCC diagnostic pop
 #endif
+
+
+//------------------------------------------------------------------------------
+// End the Faust code section
+
+
