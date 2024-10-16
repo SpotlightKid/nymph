@@ -2,6 +2,8 @@
 
 type
     faustlpf* = object
+    ParameterRange* = object
+        init*, min*, max*: cfloat
     SampleBuffer* = UncheckedArray[cfloat]
 
 
@@ -11,6 +13,7 @@ proc initfaustlpf*(dsp: ptr faustlpf, sample_rate: cint) {.importc.}
 proc instanceClearfaustlpf*(dsp: ptr faustlpf) {.importc.}
 proc computefaustlpf*(dsp: ptr faustlpf, count: cint, inputs, outputs: ptr ptr SampleBuffer) {.importc.}
 
+proc parameter_range*(index: cuint): ptr ParameterRange {.importc.}
 proc parameter_group*(index: cuint): cint {.importc}
 proc parameter_is_boolean*(index: cuint): bool {.importc}
 proc parameter_is_enum*(index: cuint): bool {.importc}

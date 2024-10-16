@@ -50,7 +50,7 @@ proc activate(instance: Lv2Handle) {.cdecl.} =
 
 proc run(instance: Lv2Handle; nSamples: cuint) {.cdecl.} =
     let plug = cast[ptr FaustLPFPlugin](instance)
-    set_cutoff(plug.flt, plug.freq[])
+    plug.flt.set_cutoff(plug.freq[])
     computefaustlpf(plug.flt, nSamples.cint, addr plug.input, addr plug.output)
 
 

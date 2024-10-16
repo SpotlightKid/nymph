@@ -3,14 +3,14 @@
 // This file was generated using the Faust compiler (https://faust.grame.fr),
 // and the Faust post-processor (https://github.com/SpotlightKid/faustpp).
 //
-// Source: lpf.dsp
+// Source: faustlpf.dsp
 // Name: FaustLPF
 // Author: Christopher Arndt
 // Copyright: Christopher Arndt, 2024
 // License: MIT
 // Version: 0.1.0
 // FAUST version: 2.75.10
-// FAUST compilation options: -a /home/chris/tmp/tmp9v2ck7tz.c -lang c -rui -ct 1 -fm def -cn faustlpf -es 1 -mcd 16 -mdd 1024 -mdy 33 -single -ftz 0 -vec -lv 0 -vs 32
+// FAUST compilation options: -a /home/chris/tmp/tmpebxwoqng.c -lang c -rui -ct 1 -fm def -cn faustlpf -es 1 -mcd 16 -mdd 1024 -mdy 33 -single -ftz 0 -vec -lv 0 -vs 32
 //------------------------------------------------------------------------------
 
 
@@ -79,9 +79,9 @@ void deletefaustlpf(faustlpf* dsp) {
 
 void metadatafaustlpf(MetaGlue* m) { 
 	m->declare(m->metaInterface, "author", "Christopher Arndt");
-	m->declare(m->metaInterface, "compile_options", "-a /home/chris/tmp/tmp9v2ck7tz.c -lang c -rui -ct 1 -fm def -cn faustlpf -es 1 -mcd 16 -mdd 1024 -mdy 33 -single -ftz 0 -vec -lv 0 -vs 32");
+	m->declare(m->metaInterface, "compile_options", "-a /home/chris/tmp/tmpebxwoqng.c -lang c -rui -ct 1 -fm def -cn faustlpf -es 1 -mcd 16 -mdd 1024 -mdy 33 -single -ftz 0 -vec -lv 0 -vs 32");
 	m->declare(m->metaInterface, "copyright", "Christopher Arndt, 2024");
-	m->declare(m->metaInterface, "filename", "lpf.dsp");
+	m->declare(m->metaInterface, "filename", "faustlpf.dsp");
 	m->declare(m->metaInterface, "filters.lib/fir:author", "Julius O. Smith III");
 	m->declare(m->metaInterface, "filters.lib/fir:copyright", "Copyright (C) 2003-2019 by Julius O. Smith III <jos@ccrma.stanford.edu>");
 	m->declare(m->metaInterface, "filters.lib/fir:license", "MIT-style STK-4.3 license");
