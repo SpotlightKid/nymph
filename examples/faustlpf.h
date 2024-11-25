@@ -1,3 +1,17 @@
+//------------------------------------------------------------------------------
+// This file was generated using the Faust compiler (https://faust.grame.fr),
+// and the Faust post-processor (https://github.com/SpotlightKid/faustdoctor).
+//
+// Source: faustlpf.dsp
+// Name: FaustLPF
+// Author: Christopher Arndt
+// Copyright: Christopher Arndt, 2024
+// License: MIT
+// Version: 0.1.0
+// FAUST version: 2.76.0
+// FAUST compilation options: -a /home/chris/tmp/tmpkjrmmie8.c -lang c -rui -ct 1 -fm def -cn faustlpf -es 1 -mcd 16 -mdd 1024 -mdy 33 -single -ftz 0 -vec -lv 0 -vs 32
+//------------------------------------------------------------------------------
+
 #ifndef  __faustlpf_H__
 #define  __faustlpf_H__
 
@@ -19,18 +33,16 @@
 #include <stdint.h>
 #include "faust/gui/CInterface.h"
 
-
 typedef struct {
-	int fSampleRate;
-	float fConst0;
-	float fConst1;
-	float fConst2;
-	FAUSTFLOAT fHslider0;
-	float fRec1_perm[4];
-	float fConst3;
-	float fRec0_perm[4];
+    int fSampleRate;
+    float fConst0;
+    float fConst1;
+    float fConst2;
+    FAUSTFLOAT fHslider0;
+    float fRec1_perm[4];
+    float fConst3;
+    float fRec0_perm[4];
 } faustlpf;
-
 
 faustlpf* newfaustlpf();
 void deletefaustlpf(faustlpf* dsp);
@@ -55,10 +67,6 @@ typedef struct {
 
 int parameter_group(unsigned index) {
     switch (index) {
-    
-    case 0:
-        return 0;
-    
     default:
         return -1;
     }
@@ -66,10 +74,8 @@ int parameter_group(unsigned index) {
 
 const char *parameter_label(unsigned index) {
     switch (index) {
-    
     case 0:
         return "Cutoff";
-    
     default:
         return 0;
     }
@@ -77,10 +83,8 @@ const char *parameter_label(unsigned index) {
 
 const char *parameter_short_label(unsigned index) {
     switch (index) {
-    
     case 0:
         return "Cutoff";
-    
     default:
         return 0;
     }
@@ -88,11 +92,9 @@ const char *parameter_short_label(unsigned index) {
 
 const char *parameter_style(unsigned index) {
     switch (index) {
-    
     case 0: {
         return "knob";
     }
-    
     default:
         return "";
     }
@@ -100,10 +102,8 @@ const char *parameter_style(unsigned index) {
 
 const char *parameter_symbol(unsigned index) {
     switch (index) {
-    
     case 0:
         return "cutoff";
-    
     default:
         return "";
     }
@@ -111,10 +111,8 @@ const char *parameter_symbol(unsigned index) {
 
 const char *parameter_unit(unsigned index) {
     switch (index) {
-
     case 0:
         return "Hz";
-
     default:
         return 0;
     }
@@ -122,12 +120,10 @@ const char *parameter_unit(unsigned index) {
 
 const ParameterRange *parameter_range(unsigned index) {
     switch (index) {
-
     case 0: {
         static const ParameterRange range = { 15000.0, 16.0, 15000.0 };
         return &range;
     }
-
     default:
         return 0;
     }
@@ -135,7 +131,6 @@ const ParameterRange *parameter_range(unsigned index) {
 
 bool parameter_is_trigger(unsigned index) {
     switch (index) {
-
     default:
         return false;
     }
@@ -143,7 +138,6 @@ bool parameter_is_trigger(unsigned index) {
 
 bool parameter_is_boolean(unsigned index) {
     switch (index) {
-
     default:
         return false;
     }
@@ -151,7 +145,6 @@ bool parameter_is_boolean(unsigned index) {
 
 bool parameter_is_enum(unsigned index) {
     switch (index) {
-
     default:
         return false;
     }
@@ -159,7 +152,6 @@ bool parameter_is_enum(unsigned index) {
 
 bool parameter_is_integer(unsigned index) {
     switch (index) {
-
     default:
         return false;
     }
@@ -167,10 +159,8 @@ bool parameter_is_integer(unsigned index) {
 
 bool parameter_is_logarithmic(unsigned index) {
     switch (index) {
-
     case 0:
         return true;
-
     default:
         return false;
     }
@@ -178,10 +168,8 @@ bool parameter_is_logarithmic(unsigned index) {
 
 FAUSTFLOAT get_parameter(faustlpf* dsp, unsigned index) {
     switch (index) {
-
     case 0:
         return dsp->fHslider0;
-
     default:
         (void)dsp;
         return 0.0;
@@ -190,11 +178,9 @@ FAUSTFLOAT get_parameter(faustlpf* dsp, unsigned index) {
 
 void set_parameter(faustlpf* dsp, unsigned index, FAUSTFLOAT value) {
     switch (index) {
-
     case 0:
         dsp->fHslider0 = value;
         break;
-
     default:
         (void)dsp;
         (void)value;
@@ -202,11 +188,9 @@ void set_parameter(faustlpf* dsp, unsigned index, FAUSTFLOAT value) {
     }
 }
 
-
 FAUSTFLOAT get_cutoff(faustlpf* dsp) {
     return dsp->fHslider0;
 }
-
 
 void set_cutoff(faustlpf* dsp, FAUSTFLOAT value) {
     dsp->fHslider0 = value;

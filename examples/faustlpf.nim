@@ -2,8 +2,10 @@
 
 type
     faustlpf* = object
+
     ParameterRange* = object
         init*, min*, max*: cfloat
+
     SampleBuffer* = UncheckedArray[cfloat]
 
 
@@ -29,8 +31,5 @@ proc parameter_unit*(index: cuint): cstring {.importc}
 proc get_parameter*(dsp: ptr faustlpf, index: cuint): cfloat {.importc}
 proc set_parameter*(dsp: ptr faustlpf, index: cuint, value: cfloat) {.importc}
 
-
 proc get_cutoff*(dsp: ptr faustlpf): cfloat {.importc}
-
-
 proc set_cutoff*(dsp: ptr faustlpf, value: cfloat) {.importc}
