@@ -28,28 +28,28 @@ type
 proc instantiate(descriptor: ptr Lv2Descriptor; sampleRate: cdouble;
                  bundlePath: cstring; features: ptr UncheckedArray[ptr Lv2Feature]):
                  Lv2Handle {.cdecl.} =
-    let amp: ptr MidiTransposePlugin = createShared(MidiTransposePlugin)
-    amp.map = cast[ptr UridMap](lv2FeaturesData(features, lv2UridMap))
+    let plug: ptr MidiTransposePlugin = createShared(MidiTransposePlugin)
+    plug.map = cast[ptr UridMap](lv2FeaturesData(features, lv2UridMap))
 
-    if amp.map.isNil:
-        freeShared(amp)
+    if plug.map.isNil:
+        freeShared(plug)
         return nil
 
-    amp.midi_urid = amp.map.map(amp.map.handle, lv2MidiMidiEvent)
+    plug.midi_urid = plug.map.map(plug.map.handle, lv2MidiMidiEvent)
 
-    return cast[Lv2Handle](amp)
+    return cast[Lv2Handle](plug)
 
 
 proc connectPort(instance: Lv2Handle; port: cuint;
                  dataLocation: pointer) {.cdecl.} =
-    let amp = cast[ptr MidiTransposePlugin](instance)
+    let plug = cast[ptr MidiTransposePlugin](instance)
     case cast[PluginPort](port)
     of PluginPort.Input:
-        amp.input = cast[ptr AtomSequence](dataLocation)
+        plug.input = cast[ptr AtomSequence](dataLocation)
     of PluginPort.Output:
-        amp.output = cast[ptr AtomSequence](dataLocation)
+        plug.output = cast[ptr AtomSequence](dataLocation)
     of PluginPort.Transposition:
-        amp.transposition = cast[ptr cfloat](dataLocation)
+        plug.transposition = cast[ptr cfloat](dataLocation)
 
 
 proc activate(instance: Lv2Handle) {.cdecl.} =
@@ -57,17 +57,17 @@ proc activate(instance: Lv2Handle) {.cdecl.} =
 
 
 proc run(instance: Lv2Handle; nSamples: cuint) {.cdecl.} =
-    let amp = cast[ptr MidiTransposePlugin](instance)
-    let outCapacity = amp.output.atom.size
-    atomSequenceClear(amp.output)
-    amp.output.atom.type = amp.input.atom.type
+    let plug = cast[ptr MidiTransposePlugin](instance)
+    let outCapacity = plug.output.atom.size
+    atomSequenceClear(plug.output)
+    plug.output.atom.type = plug.input.atom.type
 
-    if not atomSequenceIsEmpty(amp.input):
-        #echo &"Event sequence size: {amp.input.atom.size}"
-        let noteOffset = clamp(floor(amp.transposition[] + 0.5), -12, 12).uint8
+    if not atomSequenceIsEmpty(plug.input):
+        #echo &"Event sequence size: {plug.input.atom.size}"
+        let noteOffset = clamp(floor(plug.transposition[] + 0.5), -12, 12).uint8
 
-        for ev in amp.input:
-            if ev.body.`type` == amp.midi_urid:
+        for ev in plug.input:
+            if ev.body.`type` == plug.midi_urid:
                 var msg = cast[ptr UncheckedArray[uint8]](atomContents(AtomEvent, ev))
                 #echo &"0x{toHex(msg[0], 2)} 0x{toHex(msg[1], 2)} 0x{toHex(msg[2], 2)}"
 
@@ -77,7 +77,7 @@ proc run(instance: Lv2Handle; nSamples: cuint) {.cdecl.} =
                 else:
                     discard
 
-                discard atomSequenceAppendEvent(amp.output, outCapacity, ev)
+                discard atomSequenceAppendEvent(plug.output, outCapacity, ev)
 
 
 proc deactivate(instance: Lv2Handle) {.cdecl.} =
