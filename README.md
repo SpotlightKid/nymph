@@ -93,6 +93,8 @@ Required:
 
 * [Nim] >= 2.0
 
+Note: [LV2] C headers *need not* to be present to build nymph plugins.
+
 Optional:
 
 * [lv2bm] - For benchmarking and stress-testing plugins
