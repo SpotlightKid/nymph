@@ -6,7 +6,6 @@
 @prefix midi: <http://lv2plug.in/ns/ext/midi#> .
 @prefix opts: <http://lv2plug.in/ns/ext/options#> .
 @prefix params: <http://lv2plug.in/ns/ext/parameters#> .
-@prefix props: <http://lv2plug.in/ns/ext/port-props#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix units: <http://lv2plug.in/ns/extensions/units#> .
 @prefix urid: <http://lv2plug.in/ns/ext/urid#> .
@@ -49,7 +48,7 @@
         lv2:minimum -12 ;
         lv2:maximum 12 ;
         units:unit units:semitone12TET
-    ] ; 
+    ] ;
 
     rdfs:comment "A simple MIDI transposition LV2 plugin." ;
 

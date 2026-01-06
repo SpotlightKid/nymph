@@ -67,17 +67,21 @@ proc extensionData(uri: cstring): pointer {.cdecl.} =
 proc NimMain() {.cdecl, importc.}
 
 
+let descriptor = Lv2Descriptor(
+    uri: cstring(PluginUri),
+    instantiate: instantiate,
+    connectPort: connectPort,
+    activate: activate,
+    run: run,
+    deactivate: deactivate,
+    cleanup: cleanup,
+    extensionData: extensionData,
+)
+
 proc lv2Descriptor(index: cuint): ptr Lv2Descriptor {.
                    cdecl, exportc, dynlib, extern: "lv2_descriptor".} =
-    NimMain()
-
     if index == 0:
-        result = createShared(Lv2Descriptor)
-        result.uri = cstring(PluginUri)
-        result.instantiate = instantiate
-        result.connectPort = connectPort
-        result.activate = activate
-        result.run = run
-        result.deactivate = deactivate
-        result.cleanup = cleanup
-        result.extensionData = extensionData
+        NimMain()
+        return addr(descriptor)
+
+    return nil

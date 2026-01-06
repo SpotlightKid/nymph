@@ -52,10 +52,6 @@ proc connectPort(instance: Lv2Handle; port: cuint;
         plug.transposition = cast[ptr cfloat](dataLocation)
 
 
-proc activate(instance: Lv2Handle) {.cdecl.} =
-    discard
-
-
 proc run(instance: Lv2Handle; nSamples: cuint) {.cdecl.} =
     let plug = cast[ptr MidiTransposePlugin](instance)
     let outCapacity = plug.output.atom.size
@@ -80,32 +76,28 @@ proc run(instance: Lv2Handle; nSamples: cuint) {.cdecl.} =
                 discard atomSequenceAppendEvent(plug.output, outCapacity, ev)
 
 
-proc deactivate(instance: Lv2Handle) {.cdecl.} =
-    discard
-
-
 proc cleanup(instance: Lv2Handle) {.cdecl.} =
     freeShared(cast[ptr MidiTransposePlugin](instance))
-
-
-proc extensionData(uri: cstring): pointer {.cdecl.} =
-    return nil
 
 
 proc NimMain() {.cdecl, importc.}
 
 
+let descriptor = Lv2Descriptor(
+    uri: cstring(PluginUri),
+    instantiate: instantiate,
+    connectPort: connectPort,
+    activate: nil,
+    run: run,
+    deactivate: nil,
+    cleanup: cleanup,
+    extensionData: nil,
+)
+
 proc lv2Descriptor(index: cuint): ptr Lv2Descriptor {.
                    cdecl, exportc, dynlib, extern: "lv2_descriptor".} =
-    NimMain()
-
     if index == 0:
-        result = createShared(Lv2Descriptor)
-        result.uri = cstring(PluginUri)
-        result.instantiate = instantiate
-        result.connectPort = connectPort
-        result.activate = activate
-        result.run = run
-        result.deactivate = deactivate
-        result.cleanup = cleanup
-        result.extensionData = extensionData
+        NimMain()
+        return addr(descriptor)
+
+    return nil
