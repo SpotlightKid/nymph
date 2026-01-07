@@ -6,7 +6,7 @@ standard
 
 ## Examples
 
-Build the `amp.lv2` example plugin:
+Build the [amp.lv2](./examples/amp_plugin.nim) example plugin:
 
     nimble build_ex amp
 
