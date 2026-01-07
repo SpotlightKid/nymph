@@ -6,11 +6,14 @@
 @prefix params: <http://lv2plug.in/ns/ext/parameters#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix units: <http://lv2plug.in/ns/extensions/units#> .
+@prefix urid: <http://lv2plug.in/ns/ext/urid#> .
 
 <urn:nymph:examples:amp>
     a lv2:Plugin , lv2:AmplifierPlugin , doap:Project ;
 
     lv2:optionalFeature lv2:hardRTCapable , bufs:boundedBlockLength , opts:options ;
+
+    lv2:requiredFeature urid:map ;
 
     opts:supportedOption bufs:nominalBlockLength ,
                          bufs:maxBlockLength ,

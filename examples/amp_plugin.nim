@@ -1,7 +1,7 @@
 ## A simple amplifier LV2 plugin
 
-import std/math
-import nymph
+import std/[math, strformat]
+import nymph/[core, log, urid, util]
 
 const PluginUri = "urn:nymph:examples:amp"
 
@@ -14,6 +14,8 @@ type
     AmpPlugin = object
         input: ptr SampleBuffer
         output: ptr SampleBuffer
+        map: ptr UridMap
+        log: Logger
         gain: ptr cfloat
 
 
@@ -25,38 +27,53 @@ proc instantiate(descriptor: ptr Lv2Descriptor; sampleRate: cdouble;
                  bundlePath: cstring; features: ptr UncheckedArray[ptr Lv2Feature]):
                  Lv2Handle {.cdecl.} =
     try:
-        return createShared(AmpPlugin)
+        let plug: ptr AmpPlugin = createShared(AmpPlugin)
+    
+        plug.map = cast[ptr UridMap](lv2FeaturesData(features, lv2UridMap))
+
+        if plug.map.isNil:
+            freeShared(plug)
+            return nil
+
+        let logPtr = cast[ptr Log](lv2FeaturesData(features, lv2LogLog))
+        plug.log.init(logPtr, plug.map)
+        plug.log.note("nymph amp plugin instance created.")
+        return cast[Lv2Handle](plug)
     except OutOfMemDefect:
         return nil
 
 
 proc connectPort(instance: Lv2Handle; port: cuint;
                  dataLocation: pointer) {.cdecl.} =
-    let amp = cast[ptr AmpPlugin](instance)
+    let plug = cast[ptr AmpPlugin](instance)
     case cast[PluginPort](port)
     of PluginPort.Input:
-        amp.input = cast[ptr SampleBuffer](dataLocation)
+        plug.input = cast[ptr SampleBuffer](dataLocation)
     of PluginPort.Output:
-        amp.output = cast[ptr SampleBuffer](dataLocation)
+        plug.output = cast[ptr SampleBuffer](dataLocation)
     of PluginPort.Gain:
-        amp.gain = cast[ptr cfloat](dataLocation)
+        plug.gain = cast[ptr cfloat](dataLocation)
 
 
 proc activate(instance: Lv2Handle) {.cdecl.} =
-    discard
+    let plug = cast[ptr AmpPlugin](instance)
+    plug.log.note("nymph amp plugin activated.")
 
 
 proc run(instance: Lv2Handle; nSamples: cuint) {.cdecl.} =
-    let amp = cast[ptr AmpPlugin](instance)
+    let plug = cast[ptr AmpPlugin](instance)
     for pos in 0 ..< nSamples:
-        amp.output[pos] = amp.input[pos] * db2coeff(amp.gain[])
+        plug.output[pos] = plug.input[pos] * db2coeff(plug.gain[])
 
 
 proc deactivate(instance: Lv2Handle) {.cdecl.} =
-    discard
+    let plug = cast[ptr AmpPlugin](instance)
+    plug.log.note("nymph amp plugin deactivated.")
 
 
 proc cleanup(instance: Lv2Handle) {.cdecl.} =
+    let plug = cast[ptr AmpPlugin](instance)
+    plug.log.note("De-allocating nymph amp plugin instance.")
     freeShared(cast[ptr AmpPlugin](instance))
 
 
@@ -80,6 +97,9 @@ let descriptor = Lv2Descriptor(
 
 proc lv2Descriptor(index: cuint): ptr Lv2Descriptor {.
                    cdecl, exportc, dynlib, extern: "lv2_descriptor".} =
+
+    echo fmt"nymph am plugin descriptor #{index} requested"
+
     if index == 0:
         NimMain()
         return addr(descriptor)
