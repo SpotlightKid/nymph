@@ -3,7 +3,7 @@
 import std/math
 #import std/strformat
 #import std/strutils
-import nymph/[atom, core, midi, util, urid]
+import nymph/[atom, core, midi, urid, util]
 import nymph/atom/util
 
 const PluginUri = "urn:nymph:examples:miditranspose"
