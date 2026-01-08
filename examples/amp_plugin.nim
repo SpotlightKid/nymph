@@ -60,7 +60,7 @@ proc connectPort(instance: Lv2Handle; port: cuint;
 
 proc activate(instance: Lv2Handle) {.cdecl.} =
     let plug = cast[ptr AmpPlugin](instance)
-    plug.log.note("nymph amp plugin activated.")
+    plug.log.note("nymph amp LV2 plugin activated.")
 
 
 proc run(instance: Lv2Handle; nSamples: cuint) {.cdecl.} =
@@ -71,12 +71,12 @@ proc run(instance: Lv2Handle; nSamples: cuint) {.cdecl.} =
 
 proc deactivate(instance: Lv2Handle) {.cdecl.} =
     let plug = cast[ptr AmpPlugin](instance)
-    plug.log.note("nymph amp plugin deactivated.")
+    plug.log.note("nymph amp LV2 plugin deactivated.")
 
 
-proc cleanup(instance: Lv2Handle) {.cdecl.} =
+proc cleanupInstance(instance: Lv2Handle) {.cdecl.} =
     let plug = cast[ptr AmpPlugin](instance)
-    plug.log.note("De-allocating nymph amp plugin instance.")
+    plug.log.note("nymph amp LV2 plugin instance will be de-allocated.")
     freeShared(cast[ptr AmpPlugin](instance))
 
 
@@ -85,26 +85,44 @@ proc extensionData(uri: cstring): pointer {.cdecl.} =
 
 
 proc NimMain() {.cdecl, importc.}
+proc NimDestroyGlobals() {.cdecl, importc.}
 
 
-let descriptor = Lv2Descriptor(
+let pluginDescriptor = Lv2Descriptor(
     uri: cstring(PluginUri),
     instantiate: instantiate,
     connectPort: connectPort,
     activate: activate,
     run: run,
     deactivate: deactivate,
-    cleanup: cleanup,
+    cleanup: cleanupInstance,
     extensionData: extensionData,
 )
 
-proc lv2Descriptor(index: cuint): ptr Lv2Descriptor {.
-                   cdecl, exportc, dynlib, extern: "lv2_descriptor".} =
 
-    echo fmt"nymph am plugin descriptor #{index} requested"
+proc cleanupLib(handle: Lv2LibHandle) {.cdecl.} =
+    echo "Cleaning up nymph amp library globals."
+    NimDestroyGlobals()
 
+
+proc getPlugin(handle: Lv2Libhandle, index: cuint): ptr Lv2Descriptor {.cdecl.} =
     if index == 0:
-        NimMain()
-        return addr(descriptor)
+        echo &"Providing nymph amp LV2 plugin descriptor #{index} to host."
+        return addr(pluginDescriptor)
 
     return nil
+
+
+let libDescriptor = Lv2LibDescriptor(
+    handle: cast[Lv2LibHandle](nil),
+    size: sizeof(Lv2LibDescriptor).cuint,
+    cleanup: cleanupLib,
+    getPlugin: getPlugin,
+)
+
+
+proc lv2LibDescriptor(bundlePath: cstring, features: ptr UncheckedArray[ptr Lv2Feature]): ptr Lv2LibDescriptor {.
+                      cdecl, dynlib, exportc: "lv2_lib_descriptor".} =
+    NimMain()
+    echo "Providing nymph amp LV2 library descriptor to host."
+    return addr(libDescriptor)

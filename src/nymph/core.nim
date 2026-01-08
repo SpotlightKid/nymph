@@ -95,27 +95,29 @@ const
 type
     Lv2Handle* = distinct pointer
 
-type Lv2Feature* = object
-    uri*: cstring
-    data*: pointer
+    Lv2LibHandle* = distinct pointer
 
-type Lv2Descriptor* = object
-    uri*: cstring
+    Lv2Feature* = object
+        uri*: cstring
+        data*: pointer
 
-    instantiate*: proc(descriptor: ptr Lv2Descriptor, sampleRate: cdouble, bundlePath: cstring,
-                       features: ptr UncheckedArray[ptr Lv2Feature]): Lv2Handle {.cdecl.}
+    Lv2Descriptor* = object
+        uri*: cstring
+        instantiate*: proc(descriptor: ptr Lv2Descriptor, sampleRate: cdouble, bundlePath: cstring,
+                           features: ptr UncheckedArray[ptr Lv2Feature]): Lv2Handle {.cdecl.}
+        connectPort*: proc(instance: Lv2Handle, port: cuint, dataLocation: pointer) {.cdecl.}
+        activate*: proc(instance: Lv2Handle) {.cdecl.}
+        run*: proc(instance: Lv2Handle, sampleCount: cuint) {.cdecl.}
+        deactivate*: proc(instance: Lv2Handle) {.cdecl.}
+        cleanup*: proc(instance: Lv2Handle) {.cdecl.}
+        extensionData*: proc(uri: cstring): pointer {.cdecl.}
 
-    connectPort*: proc(instance: Lv2Handle, port: cuint, dataLocation: pointer) {.cdecl.}
+    Lv2LibDescriptor* = object
+        handle*: Lv2LibHandle
+        size*: cuint
+        cleanup*: proc(handle: Lv2LibHandle) {.cdecl.}
+        getPlugin*: proc(handle: Lv2LibHandle, index: cuint): ptr Lv2Descriptor {.cdecl.}
 
-    activate*: proc(instance: Lv2Handle) {.cdecl.}
+    lv2Descriptor* = proc(index: cuint): ptr Lv2Descriptor {.cdecl.}
 
-    run*: proc(instance: Lv2Handle, sampleCount: cuint) {.cdecl.}
-
-    deactivate*: proc(instance: Lv2Handle) {.cdecl.}
-
-    cleanup*: proc(instance: Lv2Handle) {.cdecl.}
-
-    extensionData*: proc(uri: cstring): pointer {.cdecl.}
-
-type lv2Descriptor* = proc(index: cuint): ptr Lv2Descriptor {.cdecl.}
-
+    lv2LibDescriptor* = proc(bundle_path: cstring, features: ptr UncheckedArray[ptr Lv2Feature]): LV2_Lib_Descriptor {.cdecl.}

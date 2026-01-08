@@ -11,7 +11,7 @@ srcDir        = "src"
 
 # Dependencies
 
-requires "nim >= 2.0"
+requires "nim >= 2.2.2"
 
 # Custom tasks
 
@@ -89,7 +89,7 @@ task lv2lint, "Run lv2lint check on given example plugin":
     let ex = getExample("lv2lint")
 
     if fileExists(ex.dll):
-        exec(&"lv2lint -s NimMain -s NimDestroyGlobals -I \"{ex.bundle}\" \"{ex.uri}\"")
+        exec(&"lv2lint -s NimMain -s NimDestroyGlobals -s lv2_lib_descriptor -I \"{ex.bundle}\" \"{ex.uri}\"")
     else:
         echo &"Example '{ex.name}' shared library not found. Use task 'build_ex' to build it."
 
