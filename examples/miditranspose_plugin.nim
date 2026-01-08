@@ -28,16 +28,19 @@ type
 proc instantiate(descriptor: ptr Lv2Descriptor; sampleRate: cdouble;
                  bundlePath: cstring; features: ptr UncheckedArray[ptr Lv2Feature]):
                  Lv2Handle {.cdecl.} =
-    let plug: ptr MidiTransposePlugin = createShared(MidiTransposePlugin)
-    plug.map = cast[ptr UridMap](lv2FeaturesData(features, lv2UridMap))
+    try:
+        let plug: ptr MidiTransposePlugin = createShared(MidiTransposePlugin)
+        plug.map = cast[ptr UridMap](lv2FeaturesData(features, lv2UridMap))
 
-    if plug.map.isNil:
-        freeShared(plug)
-        return nil
+        if plug.map.isNil:
+            freeShared(plug)
+            return cast[Lv2Handle](nil)
 
-    plug.midi_urid = plug.map.map(plug.map.handle, lv2MidiMidiEvent)
+        plug.midi_urid = plug.map.map(plug.map.handle, lv2MidiMidiEvent)
 
-    return cast[Lv2Handle](plug)
+        return cast[Lv2Handle](plug)
+    except OutOfMemDefect:
+        return cast[Lv2Handle](nil)
 
 
 proc connectPort(instance: Lv2Handle; port: cuint;
@@ -95,7 +98,7 @@ let descriptor = Lv2Descriptor(
 )
 
 proc lv2Descriptor(index: cuint): ptr Lv2Descriptor {.
-                   cdecl, exportc, dynlib, extern: "lv2_descriptor".} =
+                   cdecl, dynlib, exportc: "lv2_descriptor".} =
     if index == 0:
         NimMain()
         return addr(descriptor)

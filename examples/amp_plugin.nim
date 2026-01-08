@@ -28,12 +28,12 @@ proc instantiate(descriptor: ptr Lv2Descriptor; sampleRate: cdouble;
                  Lv2Handle {.cdecl.} =
     try:
         let plug: ptr AmpPlugin = createShared(AmpPlugin)
-    
+
         plug.map = cast[ptr UridMap](lv2FeaturesData(features, lv2UridMap))
 
         if plug.map.isNil:
             freeShared(plug)
-            return nil
+            return cast[Lv2Handle](nil)
 
         let logPtr = cast[ptr Log](lv2FeaturesData(features, lv2LogLog))
 
@@ -43,7 +43,7 @@ proc instantiate(descriptor: ptr Lv2Descriptor; sampleRate: cdouble;
         plug.log.note("nymph amp LV2 plugin instance created.")
         return cast[Lv2Handle](plug)
     except OutOfMemDefect:
-        return nil
+        return cast[Lv2Handle](nil)
 
 
 proc connectPort(instance: Lv2Handle; port: cuint;

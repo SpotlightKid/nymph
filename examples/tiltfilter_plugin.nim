@@ -30,12 +30,12 @@ proc instantiate(descriptor: ptr Lv2Descriptor; sampleRate: cdouble;
                  bundlePath: cstring; features: ptr UncheckedArray[ptr Lv2Feature]):
                  Lv2Handle {.cdecl.} =
     try:
-        let plug = createShared(TiltFilterPlugin)
+        let plug: ptr TiltFilterPlugin = createShared(TiltFilterPlugin)
         plug.flt = initTiltFilter(10_000.0, 1.0, fmLowPass, sampleRate)
         plug.smoothFreq = initParamSmooth(20.0, sampleRate)
         return cast[Lv2Handle](plug)
     except OutOfMemDefect:
-        return nil
+        return cast[Lv2Handle](nil)
 
 
 proc connectPort(instance: Lv2Handle; port: cuint;
@@ -91,7 +91,7 @@ let descriptor = Lv2Descriptor(
 )
 
 proc lv2Descriptor(index: cuint): ptr Lv2Descriptor {.
-                   cdecl, exportc, dynlib, extern: "lv2_descriptor".} =
+                   cdecl, dynlib, exportc: "lv2_descriptor".} =
     if index == 0:
         NimMain()
         return addr(descriptor)

@@ -92,7 +92,8 @@ const
     lv2CoreInstanceSampleRate* = lv2CorePrefix & "sampleRate"
     lv2CoreInstanceToggled* = lv2CorePrefix & "toggled"
 
-type Lv2Handle* = pointer
+type
+    Lv2Handle* = distinct pointer
 
 type Lv2Feature* = object
     uri*: cstring
