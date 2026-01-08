@@ -21,7 +21,7 @@ const
     lv2LogLog* = lv2LogPrefix & "log"
 
 type
-    LogHandle* = distinct pointer
+    LogHandle = distinct pointer
 
     Log* = object
         handle: LogHandle 
@@ -32,7 +32,7 @@ type
         Error, Note, Trace, Warning: Urid
 
 
-proc init*(logger: var Logger, log: ptr Log, map: ptr UridMap) = 
+proc setup*(logger: var Logger, log: ptr Log, map: ptr UridMap): bool =
   logger.pLog = log
 
   if not map.isNil:
@@ -46,25 +46,27 @@ proc init*(logger: var Logger, log: ptr Log, map: ptr UridMap) =
     logger.Trace =  Urid(0)
     logger.Warning =  Urid(0)
 
+  return not (log.isNil or map.isNil)
 
-proc log*(logger: Logger, `type`: Urid, msg: string) = 
+proc log*(logger: Logger, `type`: Urid, msg: string, nl: string = "\n") =
+    let mmsg = msg & nl
     if logger.pLog.isNil:
-        echo(msg)
+        echo(mmsg)
     else:
-        logger.pLog.printf(logger.pLog.handle, `type`, msg.cstring)
+        logger.pLog.printf(logger.pLog.handle, `type`, mmsg.cstring)
         
 
-proc error*(logger: Logger, msg: string) = 
-    log(logger, logger.Error, msg)
+proc error*(logger: Logger, msg: string, nl: string = "\n") =
+    log(logger, logger.Error, msg, nl)
 
 
-proc note*(logger: Logger, msg: string) = 
-    log(logger, logger.Note, msg)
+proc note*(logger: Logger, msg: string, nl: string = "\n") =
+    log(logger, logger.Note, msg, nl)
 
 
-proc trace*(logger: Logger, msg: string) = 
-    log(logger, logger.Trace, msg)
+proc trace*(logger: Logger, msg: string, nl: string = "\n") =
+    log(logger, logger.Trace, msg, nl)
 
 
-proc warning*(logger: Logger, msg: string) = 
-    log(logger, logger.Warning, msg)
+proc warning*(logger: Logger, msg: string, nl: string = "\n") =
+    log(logger, logger.Warning, msg, nl)

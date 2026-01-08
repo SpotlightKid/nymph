@@ -36,8 +36,11 @@ proc instantiate(descriptor: ptr Lv2Descriptor; sampleRate: cdouble;
             return nil
 
         let logPtr = cast[ptr Log](lv2FeaturesData(features, lv2LogLog))
-        plug.log.init(logPtr, plug.map)
-        plug.log.note("nymph amp plugin instance created.")
+
+        if not plug.log.setup(logPtr, plug.map):
+            plug.log.warning("LV2 Log feature not available.")
+
+        plug.log.note("nymph amp LV2 plugin instance created.")
         return cast[Lv2Handle](plug)
     except OutOfMemDefect:
         return nil
