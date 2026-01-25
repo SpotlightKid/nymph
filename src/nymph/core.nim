@@ -120,4 +120,4 @@ type
 
     lv2Descriptor* = proc(index: cuint): ptr Lv2Descriptor {.cdecl.}
 
-    lv2LibDescriptor* = proc(bundle_path: cstring, features: ptr UncheckedArray[ptr Lv2Feature]): LV2_Lib_Descriptor {.cdecl.}
+    lv2LibDescriptor* = proc(bundle_path: cstring, features: ptr UncheckedArray[ptr Lv2Feature]): Lv2LibDescriptor {.cdecl.}
