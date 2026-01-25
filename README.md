@@ -91,7 +91,7 @@ below.
 
 Required:
 
-* [Nim] >= 2.0
+* [Nim] >= 2.2.2
 
 Note: [LV2] C headers *need not* to be present to build nymph plugins.
 
