@@ -32,6 +32,7 @@ proc instantiate(descriptor: ptr Lv2Descriptor; sampleRate: cdouble;
         plug.map = cast[ptr UridMap](lv2FeaturesData(features, lv2UridMap))
 
         if plug.map.isNil:
+            plug.log.error(&"Required feature {lv2UridMap} not available.")
             freeShared(plug)
             return cast[Lv2Handle](nil)
 
