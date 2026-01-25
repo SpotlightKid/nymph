@@ -1,5 +1,5 @@
 ## Copyright 2012-2016 David Robillard <d@drobilla.net>
-## Copyright 2012-2016 Christopher Arndt <info@chrisarndt.de>
+## Copyright 2026 Christopher Arndt <info@chrisarndt.de>
 ## SPDX-License-Identifier: ISC
 ##
 ## Interface for plugins to log via the host.
@@ -48,10 +48,11 @@ proc setup*(logger: var Logger, log: ptr Log, map: ptr UridMap): bool =
 
   return not (log.isNil or map.isNil)
 
+
 proc log*(logger: Logger, `type`: Urid, msg: string, nl: string = "\n") =
     let mmsg = msg & nl
     if logger.pLog.isNil:
-        echo(mmsg)
+        stderr.write(mmsg)
     else:
         logger.pLog.printf(logger.pLog.handle, `type`, mmsg.cstring)
         
