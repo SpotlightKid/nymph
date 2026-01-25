@@ -102,6 +102,7 @@ let pluginDescriptor = Lv2Descriptor(
 
 proc cleanupLib(handle: Lv2LibHandle) {.cdecl.} =
     echo "Cleaning up nymph amp library globals."
+    GC_FullCollect()
     NimDestroyGlobals()
 
 
